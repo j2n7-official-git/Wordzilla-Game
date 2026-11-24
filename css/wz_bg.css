@@ -1,0 +1,348 @@
+/* ============================================================================
+ * @file        wordzilla_cpnt_game/css/wz_bg.css
+ * @project     WORDZILLA (Web Component - Đồ Án Cơ Sở)
+ * @description Cảnh nền Grassland 100% Pure CSS:
+ *              - Bầu trời Sky Blue 3 mốc gradient (-12% -> 5% -> 100%)
+ *              - Mặt trời Gradient + Tia nắng Lens Lights xoay mượt
+ *              - 5 đám mây trắng tự bay & 3 luồng gió lướt fade-out
+ *              - Đồi cỏ 2 tầng, 1 cây xanh, 4 bông hoa (Đỏ/Hồng/Vàng/Blue) & đất 3D
+ * @namespace   .wz-* (Cô lập hoàn toàn khỏi CSS của web tổng)
+ * ============================================================================ */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.wz-stage,
+.wz-stage *,
+.wz-stage *::before,
+.wz-stage *::after {
+  box-sizing: border-box;
+  user-select: none;
+}
+
+/* ----------------------------------------------------------------------------
+ * 1. KHUNG CHỨA COMPONENT CHÍNH (.wz-stage)
+ * ---------------------------------------------------------------------------- */
+.wz-stage {
+  position: relative;
+  width: 100%;
+  height: 100vh; /* Khi ghép vào vùng nội dung bên phải Sidebar, có thể đổi thành 100% */
+  min-height: 540px;
+  overflow: hidden;
+  background-color: #38bdf8;
+}
+
+/* ----------------------------------------------------------------------------
+ * 2. BẦU TRỜI 3 MỐC GRADIENT, MẶT TRỜI LENS LIGHTS, 5 MÂY & HƠI GIÓ
+ * ---------------------------------------------------------------------------- */
+.wz-sky-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-color: #38bdf8;
+  background-image: linear-gradient(
+    180deg,
+    #0284c7 -12%,
+    #38bdf8 5%,
+    #bae6fd 100%
+  );
+}
+
+/* Mặt trời góc trên trái */
+.wz-sun-wrapper {
+  position: absolute;
+  top: -36px;
+  left: -36px;
+  width: 220px;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wz-sun-lens-rays {
+  position: absolute;
+  inset: -45px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(255, 248, 196, 0.26) 0deg 8deg,
+    rgba(255, 248, 196, 0) 8deg 24deg
+  );
+  -webkit-mask-image: radial-gradient(circle, #000 25%, transparent 70%);
+  mask-image: radial-gradient(circle, #000 25%, transparent 70%);
+  mix-blend-mode: screen;
+  animation: wzSunLensRotate 60s linear infinite;
+}
+
+@keyframes wzSunLensRotate {
+  to { transform: rotate(360deg); }
+}
+
+.wz-sun-core {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 38%, #fffdf0 0%, #ffe66d 42%, #ffb703 78%, transparent 100%);
+  box-shadow:
+    0 0 40px 14px rgba(255, 232, 117, 0.55),
+    0 0 90px 30px rgba(255, 214, 102, 0.28);
+}
+
+/* 5 Đám mây trắng tự bay */
+.wz-cloud {
+  position: absolute;
+  background: linear-gradient(180deg, #ffffff 65%, #e3f2fd 100%);
+  border-radius: 999px;
+  box-shadow:
+    0 8px 16px rgba(28, 95, 168, 0.14),
+    inset 0 -4px 6px rgba(186, 222, 250, 0.75);
+  will-change: transform;
+}
+
+.wz-cloud::before,
+.wz-cloud::after {
+  content: "";
+  position: absolute;
+  background: inherit;
+  border-radius: 50%;
+}
+
+.wz-cloud::before { width: 46%; height: 115%; top: -52%; left: 16%; }
+.wz-cloud::after  { width: 62%; height: 145%; top: -70%; right: 14%; }
+
+@keyframes wzCloudDrift {
+  0%   { transform: translateX(-260px); }
+  100% { transform: translateX(calc(100vw + 260px)); }
+}
+
+.wz-cloud--1 { top: 13%; left: 0; width: 175px; height: 54px; opacity: 0.96; animation: wzCloudDrift 42s linear infinite; animation-delay: -8s; }
+.wz-cloud--2 { top: 22%; left: 0; width: 140px; height: 44px; opacity: 0.90; animation: wzCloudDrift 54s linear infinite; animation-delay: -32s; }
+.wz-cloud--3 { top: 9%;  left: 0; width: 105px; height: 32px; opacity: 0.72; animation: wzCloudDrift 68s linear infinite; animation-delay: -20s; }
+.wz-cloud--4 { top: 31%; left: 0; width: 120px; height: 36px; opacity: 0.80; animation: wzCloudDrift 48s linear infinite; animation-delay: -41s; }
+.wz-cloud--5 { top: 16%; left: 0; width: 96px;  height: 30px; opacity: 0.68; animation: wzCloudDrift 62s linear infinite; animation-delay: -52s; }
+
+/* 3 Luồng hơi gió lướt qua và fade-out */
+.wz-wind {
+  position: absolute;
+  height: 2.5px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.72) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+@keyframes wzWindGust {
+  0%   { opacity: 0;    transform: translateX(-60px) scaleX(0.25); }
+  25%  { opacity: 0.75; transform: translateX(40px)  scaleX(1); }
+  70%  { opacity: 0.45; transform: translateX(180px) scaleX(0.85); }
+  100% { opacity: 0;    transform: translateX(260px) scaleX(0.2); }
+}
+
+.wz-wind--1 { top: 38%; left: 14%; width: 150px; animation: wzWindGust 5.5s ease-out infinite; animation-delay: 0.5s; }
+.wz-wind--2 { top: 24%; left: 56%; width: 185px; height: 3px; animation: wzWindGust 6.8s ease-out infinite; animation-delay: 2.8s; }
+.wz-wind--3 { top: 63%; left: 34%; width: 135px; animation: wzWindGust 4.8s ease-out infinite; animation-delay: 1.6s; }
+
+/* ----------------------------------------------------------------------------
+ * 3. ĐỒNG CỎ 2 TẦNG, CÂY XANH, 4 BÔNG HOA & THANH ĐẤT ĐÁY LIỀN MẠCH
+ * ---------------------------------------------------------------------------- */
+.wz-grassland-layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 34%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.wz-hill-back {
+  position: absolute;
+  bottom: 34px;
+  right: -12%;
+  width: 72%;
+  height: 175px;
+  border-radius: 55% 45% 0 0 / 85% 85% 0 0;
+  background: linear-gradient(180deg, #74cc41 0%, #58b32b 100%);
+  box-shadow: inset 0 5px 10px rgba(255, 255, 255, 0.25);
+}
+
+.wz-hill-front {
+  position: absolute;
+  bottom: 34px;
+  left: -14%;
+  width: 118%;
+  height: 155px;
+  border-radius: 42% 58% 0 0 / 75% 65% 0 0;
+  background: linear-gradient(180deg, #8ae048 0%, #66c232 68%, #52ab24 100%);
+  box-shadow:
+    inset 0 6px 10px rgba(212, 255, 148, 0.55),
+    0 -3px 12px rgba(45, 115, 20, 0.12);
+}
+
+.wz-ground-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 16px;
+  height: 34px;
+  background: linear-gradient(180deg, #64bf30 0%, #489c1e 100%);
+  border-top: 2px solid #96eb54;
+  box-shadow: inset 0 -3px 5px rgba(25, 68, 10, 0.35);
+}
+
+.wz-grass-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+  opacity: 0.45;
+  background-image:
+    linear-gradient(135deg, #9ef25c 25%, transparent 25%),
+    linear-gradient(225deg, #9ef25c 25%, transparent 25%);
+  background-position: 0 0;
+  background-size: 16px 10px;
+}
+
+.wz-soil-base {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 16px;
+  background: linear-gradient(180deg, #9c5d27 0%, #754116 100%);
+  border-top: 2px solid #ba7436;
+}
+
+/* ============================================================================
+ * @branch      APPLE_TREE_CANOPY_CLUSTER_V3
+ * @description - Tăng đều +12% kích thước tổng thể (188x252px) giữ chuẩn tỷ lệ
+ *              - Chuyển drop-shadow lên .wz-tree-canopy để hợp nhất 4 tán lá
+ *                thành 1 khối vòm tự nhiên thay vì 4 khối tròn tách rời
+ *              - Thêm bóng đổ tán cây lên đỉnh thân gỗ tạo chiều sâu 2.5D
+ * ============================================================================ */
+.wz-tree {
+  position: absolute;
+  bottom: 50px; /* Cắm gốc chuẩn tại mép trên .wz-ground-strip */
+  left: 8.5%;
+  width: 188px;
+  height: 252px;
+  z-index: 3;
+}
+
+/* Thân cây tăng đều +12%, có bóng râm của tán lá hắt xuống đỉnh thân */
+.wz-tree-trunk {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 38px;
+  height: 108px;
+  border-radius: 10px 10px 4px 4px;
+  background: linear-gradient(90deg, #754119 0%, #9e5d2b 52%, #5e3210 100%);
+  box-shadow:
+    inset 0 14px 10px -4px rgba(22, 58, 10, 0.58),
+    0 4px 8px rgba(34, 82, 14, 0.25);
+  z-index: 1;
+}
+
+/* Khung bao chùm 4 tán: dùng filter drop-shadow để gộp viền bóng cả 4 tán */
+.wz-tree-canopy {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 172px;
+  filter: drop-shadow(0 8px 12px rgba(28, 78, 12, 0.26));
+  z-index: 2;
+}
+
+.wz-canopy-lobe {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 26%, #a8f552 0%, #63bf2e 58%, #43941a 100%);
+  box-shadow: inset 0 5px 10px rgba(215, 255, 130, 0.42);
+}
+
+/* 4 tán lá bo tròn hơi dẹt ngang & đan sâu vào nhau tạo vòm lá bồng bềnh */
+.wz-canopy-lobe--top    { width: 112px; height: 96px; top: 2px;  left: 50%; transform: translateX(-50%); z-index: 2; }
+.wz-canopy-lobe--left   { width: 104px; height: 92px; top: 42px; left: 2px;  z-index: 3; }
+.wz-canopy-lobe--right  { width: 106px; height: 94px; top: 40px; right: 2px; z-index: 3; }
+.wz-canopy-lobe--bottom { width: 116px; height: 94px; top: 66px; left: 50%; transform: translateX(-50%); z-index: 4; }
+
+/* Quả táo tỷ lệ đồng bộ +12% theo kích thước cây mới */
+.wz-apple {
+  position: absolute;
+  z-index: 5;
+  transform: translate(-50%, -50%) scale(0.042);
+  transform-origin: center center;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Tọa độ 4 quả táo căn chuẩn giữa 4 múi tán lá */
+.wz-apple--1 { top: 38px;  left: 50%; } /* Tán trên */
+.wz-apple--2 { top: 84px;  left: 25%; } /* Tán trái */
+.wz-apple--3 { top: 82px;  left: 75%; } /* Tán phải */
+.wz-apple--4 { top: 116px; left: 50%; } /* Tán dưới */
+
+/* 4 Bông hoa 5 cánh (tọa độ transform do wz_bg_physics.js điều khiển) */
+.wz-flower {
+  position: absolute;
+  bottom: 50px;
+  z-index: 4;
+  width: 24px;
+  height: 34px;
+  transform-origin: bottom center;
+  will-change: transform;
+}
+
+.wz-flower::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 18px;
+  border-radius: 2px;
+  background: #357a14;
+}
+
+.wz-flower::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--center-color);
+  box-shadow:
+    0 -6px 0 1.2px var(--petal-color),
+    5.7px -1.8px 0 1.2px var(--petal-color),
+    3.5px 4.8px 0 1.2px var(--petal-color),
+    -3.5px 4.8px 0 1.2px var(--petal-color),
+    -5.7px -1.8px 0 1.2px var(--petal-color);
+}
+
+.wz-flower--red    { left: 22%; --petal-color: #ef4444; --center-color: #fde047; }
+.wz-flower--pink   { left: 46%; --petal-color: #f472b6; --center-color: #fffbeb; }
+.wz-flower--yellow { left: 68%; --petal-color: #facc15; --center-color: #ffffff; }
+.wz-flower--blue   { left: 86%; --petal-color: #38bdf8; --center-color: #fef08a; }

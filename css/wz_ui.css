@@ -1,0 +1,679 @@
+/* ============================================================================
+ * @file        wordzilla_cpnt_game/css/wz_ui.css
+ * @project     WORDZILLA (Web Component - Đồ Án Cơ Sở)
+ * @description Toàn bộ giao diện UI nổi của game:
+ *              1. Khai báo Font Nunito offline
+ *              2. Cửa sổ đục lỗ Wooden & Form đăng nhập Slide 1
+ *              3. Vùng chơi Playfield & Đường biên nét đứt 140px
+ *              4. Thẻ từ vựng bằng gỗ rơi (250x120px)
+ *              5. Khung chat gõ từ bằng gỗ (500x80px)
+ *              6. Bảng điểm gỗ góc trên bên phải (top: 5px, right: 5px)
+ * ============================================================================ */
+
+/* ============================================================================
+ * @branch      LOCAL_FONT_NUNITO_VARIABLE
+ * @purpose     Nạp font Nunito từ thư mục cục bộ src/fonts/ để game chạy offline
+ *              mà không bị vỡ font hoặc phụ thuộc vào mạng Internet.
+ * ============================================================================ */
+@font-face {
+  font-family: 'Nunito';
+  src: url('../src/fonts/Nunito-VariableFont_wght.ttf') format('truetype-variations'),
+       url('../src/fonts/Nunito-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900; /* Hỗ trợ đầy đủ độ đậm từ mảnh (100) đến siêu đậm (900) */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nunito';
+  src: url('../src/fonts/Nunito-Italic-VariableFont_wght.ttf') format('truetype-variations'),
+       url('../src/fonts/Nunito-Italic-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ============================================================================
+ * @branch      UI_LAYER_ABSOLUTE
+ * @purpose     Tạo lớp phủ trên cùng (z-index: 10) chứa màn hình đăng nhập ban đầu.
+ * ============================================================================ */
+.wz-ui-layer {
+  position: absolute;
+  inset: 0;             /* Căng phủ kín 4 cạnh (top/right/bottom/left = 0) theo .wz-stage */
+  z-index: 10;          /* Nằm trên cùng để nhận thao tác bấm nút ở Slide 1 */
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+/* ============================================================================
+ * @branch      CURTAIN_WINDOW_720x380_R20
+ * @purpose     Tạo cửa sổ kính trong suốt ở giữa màn hình, dùng box-shadow khổng lồ
+ *              (2200px) làm màn che xung quanh, khi bấm CHƠI sẽ giãn bung ra 4 phía.
+ * ============================================================================ */
+.wz-curtain-window {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Căn tâm cửa sổ vào chính giữa màn hình */
+
+  width: 720px;
+  height: 380px;
+  max-width: 90%;
+  border-radius: 20px;
+
+  background: transparent; /* Lõi trong suốt nhìn xuyên ra đồng cỏ phía sau */
+  border: 6px solid #75471e;
+  box-shadow:
+    inset 0 2px 2px rgba(255, 232, 195, 0.65),
+    inset 0 -2px 3px rgba(34, 15, 2, 0.8),
+    0 0 0 2200px #9bd1ea; /* Màn che màu xanh Sky Steel phủ kín vùng bên ngoài cửa sổ */
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 8px;
+
+  /* Làm mượt hiệu ứng mở rộng cửa sổ khi bắt đầu game */
+  transition:
+    width 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    border-width 0.5s ease;
+  will-change: width, height;
+}
+
+/* Trạng thái giãn bung cửa sổ ra 4 phía đẩy màn che biến mất */
+.wz-curtain-window.is-stretching {
+  width: calc(100% + 60px);
+  height: calc(100% + 60px);
+  max-width: none;
+  border-width: 0px;
+}
+
+/* Ẩn hoàn toàn sau khi hiệu ứng mở màn kết thúc */
+.wz-curtain-window.is-hidden {
+  display: none;
+}
+
+/* ----------------------------------------------------------------------------
+ * 2. SLIDE 1: HỘP SIGN IN & CHỌN MỨC ĐỘ NẰM PHÍA DƯỚI CỬA SỔ
+ * ---------------------------------------------------------------------------- */
+.wz-slide {
+  width: 100%;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.wz-slide.is-fading-out {
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+}
+
+.wz-signin-box {
+  width: 100%;
+  background: rgba(245, 247, 250, 0.82);
+  backdrop-filter: blur(6px);
+  border: 2px solid #7c5c1e;
+  border-radius: 5px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+}
+
+.wz-signin-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.wz-signin-label {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  color: #4a2c0f;
+  white-space: nowrap;
+  min-width: 105px;
+}
+
+.wz-signin-input {
+  flex: 1;
+  height: 28px;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #3b230a;
+  background: #fdf0d5;
+  border: 2px solid #8a6424;
+  border-radius: 4px;
+  outline: none;
+  box-shadow: inset 0 2px 4px rgba(82, 52, 12, 0.2);
+}
+
+.wz-signin-input:focus {
+  border-color: #d97706;
+  background: #fffbeb;
+}
+
+.wz-diff-group {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.wz-diff-btn {
+  height: 28px;
+  border: 2px solid #6b4c16;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.1s ease, filter 0.15s ease, box-shadow 0.15s ease;
+}
+
+.wz-diff-btn--easy   { background: #74b83e; color: #ffffff; text-shadow: 0 1px 1px rgba(0,0,0,0.4); }
+.wz-diff-btn--medium { background: #f5d142; color: #4a2c0f; }
+.wz-diff-btn--hard   { background: #d62839; color: #ffffff; text-shadow: 0 1px 1px rgba(0,0,0,0.4); }
+
+.wz-diff-btn.is-selected {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 2px #ffffff, 0 0 8px rgba(0, 0, 0, 0.35);
+  filter: brightness(1.08);
+}
+
+.wz-play-btn {
+  width: 100%;
+  height: 30px;
+  margin-top: 2px;
+  border: 2px solid #4a2608;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #9c5a25 0%, #6e3a11 100%);
+  color: #fde68a;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 230, 180, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: filter 0.15s ease, transform 0.1s ease;
+}
+
+.wz-play-btn:hover {
+  filter: brightness(1.1);
+}
+
+.wz-play-btn:active {
+  transform: translateY(1px);
+}
+
+/* ============================================================================
+ * @branch      BOUNDARY_LINE_140PX_DARK_BLUE
+ * @purpose     Khung .wz-playfield phủ toàn màn hình (từ đỉnh trời xuống đáy)
+ *              làm hệ tọa độ chuẩn cho thẻ rơi, vạch biên 140px và bảng điểm.
+ * ============================================================================ */
+.wz-playfield {
+  position: absolute;
+  inset: 0;             /* Bắt buộc phủ kín 100% .wz-stage để top: 5px nằm trên đỉnh trời */
+  z-index: 6;           /* Nằm trên cảnh nền cỏ (z-index: 2) và dưới màn che Slide 1 (z-index: 10) */
+  pointer-events: none; /* Cho phép click xuyên qua vùng trống */
+  overflow: hidden;     /* Cắt gọn các phần tử khi đang giấu ngoài mép màn hình */
+}
+
+/* Đường biên nét đứt cách đáy 140px: giấu lúc đăng nhập, chỉ hiện khi vào game */
+.wz-boundary-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 140px;
+  height: 0;
+  border-top: 3px dashed rgba(13, 40, 80, 0.8);
+  z-index: 1;           /* Nằm phía sau thẻ từ rơi (z-index: 3) */
+  opacity: 0;           /* Ẩn mặc định ở Slide 1 */
+  transition: opacity 0.35s ease;
+}
+
+/* Khi JS gắn class .is-active lúc bấm CHƠI, đường biên mới hiện ra */
+.wz-playfield.is-active .wz-boundary-line {
+  opacity: 1;
+}
+
+/* ============================================================================
+ * @branch      WOODEN_WORD_PLAQUE_250X120_DEBOSSED
+ * @purpose     Thẻ bảng gỗ rơi từ trên trời xuống (250x120px), gồm nắp nâu đậm,
+ *              thân nâu đất và lõi kem ép lõm chứa từ vựng.
+ * ============================================================================ */
+.wz-word-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  border: 3.5px solid #120903;
+  border-radius: 5px 5px 20px 20px; /* Bo trên 5px, bo dưới 20px */
+  overflow: hidden;
+  box-shadow: 0 8px 18px rgba(16, 36, 58, 0.32);
+  will-change: transform; /* Tối ưu GPU cho chuyển động rơi 60fps */
+  z-index: 3;
+}
+
+.wz-word-card__cap {
+  height: 30px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #7d4923 0%, #633717 100%);
+  border-bottom: 3.5px solid #120903;
+  box-shadow: inset 0 1.5px 0 rgba(255, 224, 185, 0.32);
+}
+
+.wz-word-card__body {
+  flex: 1;
+  background: linear-gradient(180deg, #aa7048 0%, #965e38 100%);
+  padding: 11px 16px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wz-word-card__slot {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #e2c58e 0%, #f0d9ab 100%);
+  border: 1.5px solid #593317;
+  border-radius: 10px;
+  /* Đổ bóng trong (inset) tạo cảm giác mặt kem bị đè ép lõm xuống */
+  box-shadow:
+    inset 0 4px 6px rgba(34, 14, 3, 0.72),
+    inset 0 1px 2px rgba(0, 0, 0, 0.65),
+    inset 0 -2px 3px rgba(255, 248, 228, 0.72),
+    0 1.5px 0 rgba(255, 224, 188, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Nunito', sans-serif;
+  font-size: 21px;
+  font-weight: 800;
+  color: #2b1608;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(255, 250, 235, 0.65);
+}
+
+.wz-word-card.is-at-limit {
+  border-color: #d90429;
+  box-shadow: 0 0 16px rgba(217, 4, 41, 0.65);
+}
+
+/* ============================================================================
+ * @branch      WOODEN_CHAT_BOX_500X80_FLYIN
+ * @purpose     Khung nhập từ (500x80px) giấu dưới đất và bay mượt lên cách đáy
+ *              30px khi vào game; dùng font Nunito đậm cỡ 25px.
+ * ============================================================================ */
+.wz-chat-box {
+  position: absolute;
+  left: 50%;
+  bottom: 30px; /* Vị trí đích: cách mặt đất đáy 30px */
+  width: 500px;
+  height: 80px;
+  max-width: 92%;
+  padding: 10px 18px;
+  border: 3.5px solid #2b1405;
+  border-radius: 14px;
+  z-index: 5;
+
+  /* Vân gỗ sọc ngang + 2 tầng màu chuyển khối tại mốc 50% -> 52% */
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0px,
+      transparent 9px,
+      rgba(42, 18, 4, 0.24) 9px,
+      rgba(42, 18, 4, 0.24) 11px
+    ),
+    linear-gradient(
+      180deg,
+      #a86b3e 0%,
+      #a86b3e 50%,
+      #965c32 50%,
+      #965c32 52%,
+      #89522b 52%,
+      #89522b 100%
+    );
+
+  box-shadow:
+    inset 0 2px 0 rgba(255, 226, 190, 0.42),
+    inset 0 -3px 6px rgba(32, 13, 2, 0.55),
+    0 10px 22px rgba(10, 26, 44, 0.42);
+
+  /* Giấu dưới đáy màn hình (+140px) trước khi vào game */
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(-50%, 140px, 0);
+  transition:
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.45s ease;
+  will-change: transform, opacity;
+}
+
+/* Khi có class .is-visible: trồi mượt từ dưới đất lên đúng vị trí bottom: 30px */
+.wz-chat-box.is-visible {
+  opacity: 1;
+  pointer-events: auto; /* Bật lại tương tác chuột & bàn phím để người chơi gõ chữ */
+  transform: translate3d(-50%, 0, 0);
+}
+
+.wz-chat-input {
+  width: 100%;
+  height: 100%;
+  padding: 0 14px;
+  border: 2px solid #4a250b;
+  border-radius: 8px;
+  background: rgba(253, 243, 222, 0.92);
+  box-shadow: inset 0 3px 6px rgba(48, 22, 5, 0.45);
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: #2b1405;
+  text-align: center;
+  outline: none;
+}
+
+.wz-chat-input::placeholder {
+  font-family: 'Nunito', sans-serif !important;
+  color: rgba(74, 37, 11, 0.45);
+  font-weight: 700;
+}
+
+.wz-chat-input:focus {
+  background: #fffbeb;
+  border-color: #f59e0b;
+  box-shadow:
+    inset 0 2px 4px rgba(48, 22, 5, 0.35),
+    0 0 0 3px rgba(251, 191, 36, 0.45);
+}
+
+/* ============================================================================
+ * @branch      WOODEN_SCOREBOARD_DIAGONAL_GRAIN_16PLUS
+ * @purpose     Bảng điểm gỗ neo sát góc trên bên phải (top: 5px, right: 5px),
+ *              giấu trên mép trời (-260px) và rơi mượt xuống khi vào game.
+ * ============================================================================ */
+.wz-score-board {
+  position: absolute;
+  top: 5px;             /* Cách mép trên bầu trời đúng 5px */
+  right: 5px;           /* Cách mép phải màn hình đúng 5px */
+  width: 220px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 3.5px solid #593112;
+  border-radius: 8px;
+  z-index: 5;
+
+  /* Vân gỗ chéo 135deg chu kỳ 17px (13px nền + 4px vạch tối) tạo >= 16 sọc chéo */
+  background:
+    repeating-linear-gradient(
+      135deg,
+      transparent 0px,
+      transparent 13px,
+      rgba(48, 20, 4, 0.22) 13px,
+      rgba(48, 20, 4, 0.22) 17px
+    ),
+    linear-gradient(180deg, #a86b3e 0%, #8f572e 100%);
+
+  box-shadow:
+    inset 0 2px 0 rgba(255, 226, 190, 0.42),
+    inset 0 -3px 5px rgba(32, 13, 2, 0.5),
+    0 8px 18px rgba(12, 32, 54, 0.35);
+
+  /* Giấu hẳn phía trên mép trời (-260px) trước khi vào game */
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, -260px, 0);
+  transition:
+    transform 0.65s cubic-bezier(0.22, 1.12, 0.36, 1),
+    opacity 0.35s ease;
+  will-change: transform, opacity;
+}
+
+/* Khi vào game: rơi từ trên trời xuống đậu tại góc top: 5px, right: 5px */
+.wz-score-board.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Khung kem đục lõm dùng chung cho cả 3 ô */
+.wz-score-slot {
+  width: 100%;
+  background: linear-gradient(180deg, #eed8b5 0%, #f6e6cc 100%);
+  border: 2px solid #6e411c;
+  box-shadow:
+    inset 0 3px 5px rgba(45, 20, 4, 0.52),
+    inset 0 -1.5px 2px rgba(255, 250, 238, 0.72),
+    0 1px 0 rgba(255, 224, 188, 0.38);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800;
+  color: #4a250b;
+  text-shadow: 0 1px 0 rgba(255, 250, 240, 0.75);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Ô Tên & Ô Mức độ: bo toàn tròn (999px), chữ 20px */
+.wz-score-slot--pill {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 20px;
+}
+
+/* Ô Điểm chính ở giữa: bo góc 8px, chữ 48px */
+.wz-score-slot--main {
+  height: 112px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 48px;
+  line-height: 1;
+}
+
+/* ============================================================================
+ * @branch      LOGO_IN_SKY_WINDOW_AND_ALIGNED_SIGNIN_16PX
+ * @description - Đặt logo nằm gọn giữa khoảng bầu trời bên trong cửa sổ gỗ
+ *              - Căn thẳng mép trái/phải và chiều cao (36px) của 3 nút độ khó
+ *                khớp 100% với ô nhập tên người chơi (Font Nunito 16px)
+ * ============================================================================ */
+.wz-logo-slot {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.wz-game-logo {
+  height: 340px;
+  width: auto;
+  object-fit: contain;
+  transform: scale(0.8);
+  transform-origin: center center;
+  user-select: none;
+  transition: opacity 0.26s ease, transform 0.26s ease;
+}
+
+.wz-game-logo.is-fading-out {
+  opacity: 0;
+  transform: scale(0.58);
+}
+
+/* Khóa font Nunito & cỡ 16px đồng bộ cho Form Sign In */
+.wz-signin-box,
+.wz-signin-label,
+.wz-signin-input,
+.wz-diff-btn,
+.wz-play-btn {
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 16px;
+}
+
+/* Cố định bề rộng label = 142px để ô nhập tên & nhóm nút độ khó thẳng hàng dọc */
+.wz-signin-label {
+  width: 142px;
+  min-width: 142px;
+  flex-shrink: 0;
+  font-weight: 800;
+}
+
+/* Đồng bộ chiều cao 36px cho ô nhập tên và 3 nút Dễ / Trung bình / Khó */
+.wz-signin-input,
+.wz-diff-btn {
+  height: 36px;
+}
+
+.wz-signin-input {
+  font-weight: 700;
+}
+
+.wz-diff-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.wz-play-btn {
+  height: 38px;
+  font-weight: 900;
+}
+
+/* ============================================================================
+ * @branch      NAME_VALIDATION_SPEECH_BUBBLE_AND_SHAKE
+ * @description Bong bóng hội thoại chỉ xuống ô nhập tên + hiệu ứng rung báo lỗi
+ * ============================================================================ */
+.wz-input-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+}
+
+.wz-input-wrapper .wz-signin-input {
+  width: 100%;
+}
+
+.wz-error-bubble {
+  position: absolute;
+  left: 12px;
+  bottom: calc(100% + 10px);
+  z-index: 30;
+  /* @doclogger z-index: 30 giữ bong bóng nổi trên viền cửa sổ và ô nhập tên */
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 2.5px solid #4a250b;
+
+  /* Lớp 1: 10 sọc chéo 45° dày 4px | Lớp 2: Vỏ gỗ nâu gradient mềm 0-50-100 */
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0px,
+      transparent 18px,
+      rgba(38, 15, 3, 0.22) 18px,
+      rgba(38, 15, 3, 0.22) 22px
+    ),
+    linear-gradient(
+      180deg,
+      #c27d42 0%,
+      #965728 50%,
+      #6b3812 100%
+    );
+
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 232, 195, 0.55),
+    inset 0 -2px 3px rgba(34, 15, 2, 0.65),
+    0 6px 16px rgba(18, 38, 58, 0.35);
+
+  color: #ffede1;
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(36, 14, 2, 0.85);
+  pointer-events: none;
+
+  opacity: 0;
+  transform: translateY(6px) scale(0.95);
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Viền ngoài mũi tên bong bóng chỉ xuống ô nhập tên */
+.wz-error-bubble::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 20px;
+  border-width: 7px;
+  border-style: solid;
+  border-color: #4a250b transparent transparent transparent;
+}
+
+/* Lõi mũi tên khớp 100% màu vỏ gỗ đáy (#6b3812) */
+.wz-error-bubble::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 22px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #6b3812 transparent transparent transparent;
+}
+
+.wz-error-bubble.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+@keyframes wzInputShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+/* Nhấn viền hổ phách ấm đồng bộ tone gỗ thay vì đỏ gắt */
+.wz-signin-input.is-shaking {
+  border-color: #c2410c !important;
+  background: #fef3c7 !important;
+  animation: wzInputShake 0.32s ease;
+}
+
+/* ============================================================================
+ * @branch      DEV_VERSION_TAG_STYLE_AND_FADEOUT
+ * @doclogger   - Neo nhãn phiên bản ngay dưới mép ngoài bên phải khung gỗ
+ *                (right: -6px bù trừ viền 6px để thẳng mép ngoài của khung)
+ *              - Dùng font Nunito thường (600), màu nâu #4a250b, fade-out 0.26s
+ * ============================================================================ */
+.wz-version-tag {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: -6px;
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  color: #4a250b;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.26s ease, transform 0.26s ease;
+}
+
+.wz-version-tag.is-fading-out {
+  opacity: 0;
+  transform: translateY(-4px);
+}

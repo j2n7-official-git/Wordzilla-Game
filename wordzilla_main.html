@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wordzilla Game</title>
+
+  <!-- Tách 2 file CSS độc lập: Nền (Background) & Giao diện (UI) -->
+  <link rel="stylesheet" href="css/wz_bg.css" />
+  <link rel="stylesheet" href="css/wz_ui.css" />
+</head>
+<body>
+
+  <!--
+    KHUNG TEST COMPONENT ĐỘC LẬP
+    Khi ghép vào web tổng của bạn cùng nhóm, chỉ cần copy toàn bộ
+    thẻ <div class="wz-stage"> này đặt vào vùng nội dung bên phải Sidebar.
+  -->
+  <div class="wz-stage" id="wz-game-stage">
+
+    <!-- NHÁNH 1: BẦU TRỜI, MẶT TRỜI LENS LIGHTS, 5 ĐÁM MÂY & 3 LUỒNG GIÓ -->
+    <div class="wz-sky-layer" aria-hidden="true">
+      <div class="wz-sun-wrapper">
+        <div class="wz-sun-lens-rays"></div>
+        <div class="wz-sun-core"></div>
+      </div>
+
+      <div class="wz-cloud wz-cloud--1"></div>
+      <div class="wz-cloud wz-cloud--2"></div>
+      <div class="wz-cloud wz-cloud--3"></div>
+      <div class="wz-cloud wz-cloud--4"></div>
+      <div class="wz-cloud wz-cloud--5"></div>
+
+      <div class="wz-wind wz-wind--1"></div>
+      <div class="wz-wind wz-wind--2"></div>
+      <div class="wz-wind wz-wind--3"></div>
+    </div>
+
+    <!-- NHÁNH 2: ĐỒNG CỎ, 1 CÂY XANH, 4 BÔNG HOA & THANH ĐẤT NGANG -->
+    <div class="wz-grassland-layer" aria-hidden="true">
+      <div class="wz-hill-back"></div>
+      <div class="wz-hill-front"></div>
+
+      <!-- ====================================================================
+           @branch      GROUNDED_APPLE_TREE_4X4
+           @description Cây táo phóng to: thân gỗ + chùm 4 tán lá + 4 quả táo
+                        đặt cố định tại 4 tọa độ trên tán (tỷ lệ 20% gốc).
+           ==================================================================== -->
+      <div class="wz-tree">
+        <div class="wz-tree-trunk"></div>
+
+        <!-- Chùm 4 tán lá xếp tầng -->
+        <div class="wz-tree-canopy">
+          <div class="wz-canopy-lobe wz-canopy-lobe--top"></div>
+          <div class="wz-canopy-lobe wz-canopy-lobe--left"></div>
+          <div class="wz-canopy-lobe wz-canopy-lobe--right"></div>
+          <div class="wz-canopy-lobe wz-canopy-lobe--bottom"></div>
+        </div>
+
+        <!-- 4 Quả táo đặt tại 4 vị trí cố định -->
+        <img class="wz-apple wz-apple--1" src="src/obj_component/wz_apple.png" alt="" />
+        <img class="wz-apple wz-apple--2" src="src/obj_component/wz_apple.png" alt="" />
+        <img class="wz-apple wz-apple--3" src="src/obj_component/wz_apple.png" alt="" />
+        <img class="wz-apple wz-apple--4" src="src/obj_component/wz_apple.png" alt="" />
+      </div>
+
+      <!-- 4 Bông hoa 5 cánh: Đỏ - Hồng - Vàng - Xanh Blue -->
+      <div class="wz-flower wz-flower--red"></div>
+      <div class="wz-flower wz-flower--pink"></div>
+      <div class="wz-flower wz-flower--yellow"></div>
+      <div class="wz-flower wz-flower--blue"></div>
+
+      <div class="wz-ground-strip">
+        <div class="wz-grass-pattern"></div>
+      </div>
+      <div class="wz-soil-base"></div>
+    </div>
+
+    <!-- NHÁNH 3: MÀN CHE SKY STEEL ĐỤC LỖ CỬA SỔ GỖ 2:1 (500x250px) & SLIDE 1 -->
+    <div class="wz-ui-layer" id="wz-ui-root">
+
+        <!-- ======================================================================
+        @branch      PLAYFIELD_AND_BOUNDARY_125PX
+        @purpose     Vùng chơi (Playfield) bao phủ toàn màn hình, làm hệ tọa độ
+                    gốc để canh chuẩn vị trí cho Bảng điểm (trên trời) và
+                    Khung chat (dưới đất).
+        ====================================================================== -->
+        <div class="wz-playfield" id="wz-playfield">
+
+            <!-- ====================================================================
+            @branch     WOODEN_SCOREBOARD_HUD
+            @purpose    ĐÃ ĐƯA RA NGOÀI KHUNG CHAT! Bảng điểm giờ là con trực tiếp
+                        của Playfield, nên lệnh top: 5px; right: 5px; trong CSS
+                        mới neo đúng vào góc trên cùng bên phải của bầu trời.
+            ==================================================================== -->
+            <aside class="wz-score-board" id="wz-score-board" aria-label="Bảng điểm người chơi">
+                <div class="wz-score-slot wz-score-slot--pill" id="wz-hud-player">Player</div>
+                <div class="wz-score-slot wz-score-slot--main" id="wz-hud-score">0</div>
+                <div class="wz-score-slot wz-score-slot--pill" id="wz-hud-diff">Dễ</div>
+            </aside>
+
+            <!-- Vạch giới hạn màu đỏ báo hiệu từ vựng sắp chạm đất -->
+            <div class="wz-boundary-line" id="wz-boundary-line" aria-hidden="true"></div>
+
+            <!-- ====================================================================
+            @branch      WOODEN_TYPING_CHAT_BOX_500X80
+            @purpose     Khung nhập liệu nằm độc lập ở dưới đáy. 
+            ==================================================================== -->
+            <div class="wz-chat-box" id="wz-chat-box">
+                <input
+                    type="text"
+                    id="wz-chat-input"
+                    class="wz-chat-input"
+                    placeholder="Gõ từ tại đây..."
+                    autocomplete="off"
+                    spellcheck="false"
+                />
+            </div>
+        </div>
+
+
+        <!-- Cửa sổ đục lỗ xuyên thấu ra nền Grassland phía sau -->
+        <div class="wz-curtain-window" id="wz-curtain-window">
+
+        <!-- @branch DEV_VERSION_TAG_RIGHT_ALIGNED: Nhãn phiên bản neo góc dưới phải khung gỗ -->
+        <span class="wz-version-tag" id="wz-version-tag">v4.0.1166_devT1</span>
+        <!-- ====================================================================
+             @branch      WORDZILLA_SKY_WINDOW_LOGO_SLOT
+             @description Khung flex chiếm toàn bộ phần bầu trời phía trên
+                          form Sign In để căn giữa logo tỉ lệ 0.65x gọn gàng.
+             ==================================================================== -->
+        <div class="wz-logo-slot">
+          <img
+            src="src/logo/WordZilla_logo_ofc.png"
+            alt="Wordzilla Logo"
+            class="wz-game-logo"
+            id="wz-game-logo"
+          />
+        </div>
+
+        <!-- SLIDE 1: FORM SIGN IN & CHỌN MỨC ĐỘ (GIỐNG PHÁC THẢO) -->
+        <section class="wz-slide wz-slide--active" id="wz-slide-1" data-slide="1">
+          <div class="wz-signin-box">
+            <div class="wz-signin-row">
+              <label class="wz-signin-label" for="wz-player-name">TÊN NGƯỜI CHƠI</label>
+              <!-- ================================================================
+                @branch      SIGNIN_NAME_INPUT_ERROR_BUBBLE
+                @description Bọc input để neo bong bóng cảnh báo chặn vô danh
+              ================================================================ -->
+              <div class="wz-input-wrapper">
+                <div id="wz-name-error-bubble" class="wz-error-bubble" role="alert">
+                  ERROR: Bạn cần nhập tên trước khi chơi
+                </div>
+                <input
+                  type="text"
+                  id="wz-player-name"
+                  class="wz-signin-input"
+                  placeholder="Nhập tên của bạn..."
+                  maxlength="25"
+                  autocomplete="off"
+                />
+              </div>
+            </div>
+
+            <div class="wz-signin-row">
+              <span class="wz-signin-label">MỨC ĐỘ</span>
+              <div class="wz-diff-group" id="wz-diff-group">
+                <button type="button" class="wz-diff-btn wz-diff-btn--easy is-selected" data-diff="easy">DỄ</button>
+                <button type="button" class="wz-diff-btn wz-diff-btn--medium" data-diff="medium">TRUNG BÌNH</button>
+                <button type="button" class="wz-diff-btn wz-diff-btn--hard" data-diff="hard">KHÓ</button>
+              </div>
+            </div>
+
+            <button type="button" class="wz-play-btn" id="wz-btn-start">CHƠI</button>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Nhúng duy nhất module điều phối trung tâm của Wordzilla -->
+  <script type="module" src="js/wz_main.js"></script>
+
+</body>
+</html>
