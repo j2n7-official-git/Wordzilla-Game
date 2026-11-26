@@ -259,12 +259,29 @@
   z-index: 3;
 }
 
+/* [UPDATE] Nắp gỗ nâu đậm: bật flex để căn giữa dòng gợi ý ký tự */
 .wz-word-card__cap {
   height: 30px;
   flex-shrink: 0;
+  padding: 0 10px;
   background: linear-gradient(180deg, #7d4923 0%, #633717 100%);
   border-bottom: 3.5px solid #120903;
   box-shadow: inset 0 1.5px 0 rgba(255, 224, 185, 0.32);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Chữ gợi ý màu vàng (VD: g _ _ _ _ _ _) */
+.wz-word-card__hint {
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  color: #ffe770;
+  letter-spacing: 0.5px;
+  text-transform: lowercase;
+  text-shadow: 0 1.5px 0 #1a0c04, 0 0 6px rgba(253, 224, 71, 0.35);
+  white-space: nowrap;
 }
 
 .wz-word-card__body {
@@ -676,4 +693,79 @@
 .wz-version-tag.is-fading-out {
   opacity: 0;
   transform: translateY(-4px);
+}
+
+/* ============================================================================
+ * @branch      WOODEN_DEBRIS_REAL_PHYSICS_AND_SCORE_FLOAT_07S
+ * @doclogger   - Mảnh vỡ gỗ (.wz-debris): giữ nguyên opacity: 1 (không làm mờ),
+ *                tọa độ & góc xoay do engine vật lý JS tính theo trọng lực thật
+ *              - Chữ cộng điểm (.wz-score-popup): bay float lên trong tổng 0.7s,
+ *                giữ rõ 0.2s đầu (~28.5%) và fade-out mượt trong 0.5s còn lại
+ * ============================================================================ */
+.wz-debris {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 1;
+  will-change: transform;
+}
+
+/* 3 viên gỗ nâu đậm hình vuông 50px */
+.wz-debris--dark {
+  width: 50px;
+  height: 50px;
+  border-radius: 6px;
+  background: linear-gradient(145deg, #7d4923 0%, #593112 100%);
+  border: 2.5px solid #1a0c04;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 224, 185, 0.35),
+    0 6px 12px rgba(18, 9, 3, 0.4);
+}
+
+/* 3 viên dát gỗ màu da hình vuông 32px */
+.wz-debris--skin {
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+  background: linear-gradient(145deg, #f5cfb8 0%, #e3b193 100%);
+  border: 2px solid #593317;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 250, 245, 0.7),
+    0 4px 10px rgba(34, 14, 3, 0.35);
+}
+
+/* Hiệu ứng [+ số điểm] bay lên tại vị trí từ vỡ (Tổng 0.7s, fade-out 0.5s) */
+.wz-score-popup {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 8;
+  pointer-events: none;
+  user-select: none;
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 28px;
+  font-weight: 900;
+  color: #fde047;
+  -webkit-text-stroke: 1.5px #4a250b;
+  text-shadow: 0 3px 6px rgba(34, 14, 3, 0.75);
+  will-change: transform, opacity;
+  animation: wzScoreFloatFade 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes wzScoreFloatFade {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -30%) scale(0.85);
+  }
+  28.5% {
+    /* Mốc 0.2s: chữ nở rõ nét trước khi bắt đầu fade-out 0.5s */
+    opacity: 1;
+    transform: translate(-50%, -75%) scale(1.08);
+  }
+  100% {
+    /* Mốc 0.7s: bay cao lên và mờ hẳn */
+    opacity: 0;
+    transform: translate(-50%, -145%) scale(1);
+  }
 }
