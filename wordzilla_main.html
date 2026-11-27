@@ -42,9 +42,9 @@
       <div class="wz-hill-front"></div>
 
       <!-- ====================================================================
-           @branch      GROUNDED_APPLE_TREE_4X4
-           @description Cây táo phóng to: thân gỗ + chùm 4 tán lá + 4 quả táo
-                        đặt cố định tại 4 tọa độ trên tán (tỷ lệ 20% gốc).
+           @branch        GROUNDED_APPLE_TREE_4X4
+           @description   Cây táo phóng to: thân gỗ + chùm 4 tán lá + 4 quả táo
+                          đặt cố định tại 4 tọa độ trên tán (tỷ lệ 20% gốc).
            ==================================================================== -->
       <div class="wz-tree">
         <div class="wz-tree-trunk"></div>
@@ -99,8 +99,63 @@
                 <div class="wz-score-slot wz-score-slot--pill" id="wz-hud-diff">Dễ</div>
             </aside>
 
+            <!-- ======================================================================
+            @module      [UPDATE] FlowerLifeHUD
+            @docstring   Hiển thị 3 mạng hoa đỏ ngay dưới Bảng điểm (khung vàng).
+                        Mỗi thẻ <img> mang data-life-index (0, 1, 2) để JS đổi
+                        sang ảnh hoa xám (wz_flower_life_off.png) từ phải qua trái
+                        mỗi khi có từ rơi chạm vạch biên 140px.
+            ====================================================================== -->
+            <div class="wz-life-board" id="wz-life-board" aria-label="Số mạng hoa còn lại">
+                <img src="src/life-visual/wz_flower_life_normal.png" alt="Mạng 1" class="wz-life-flower" data-life-index="0" />
+                <img src="src/life-visual/wz_flower_life_normal.png" alt="Mạng 2" class="wz-life-flower" data-life-index="1" />
+                <img src="src/life-visual/wz_flower_life_normal.png" alt="Mạng 3" class="wz-life-flower" data-life-index="2" />
+            </div>
+
             <!-- Vạch giới hạn màu đỏ báo hiệu từ vựng sắp chạm đất -->
             <div class="wz-boundary-line" id="wz-boundary-line" aria-hidden="true"></div>
+
+            <!-- ======================================================================
+            @module      [UPDATE] ExitGameButtonUI
+            @docstring   Nút thoát màn chơi đặt cố định góc dưới-trái (bottom: 10px,
+                        left: 10px), kích thước 80x80px, dùng sprite 3 trạng thái
+                        (normal / hover / pressed) bằng CSS background-image.
+            ====================================================================== -->
+            <button
+              type="button"
+              id="wz-btn-exit"
+              class="wz-exit-btn"
+              title="Thoát màn chơi"
+              aria-label="Thoát màn chơi"
+            ></button>
+            <!-- ======================================================================
+            @module       ExitConfirmComicBubble
+            @description   Hộp hội thoại kiểu truyện tranh (tỉ lệ 4:3, bo góc 8px)
+                          ngoắc trực tiếp vào nút #wz-btn-exit ở góc dưới-trái:
+                          - Lõi trên: Khung gỗ nâu đục thẳng (flat-cut deboss) chứa
+                          lời cảnh báo mất tiến trình gọn gàng giống Chemkachu.
+                          - Đáy hộp: 2 nút bevel gradient lồi ("Thoát" & "Ở lại").
+            ====================================================================== -->
+            <div
+              id="wz-exit-bubble"
+              class="wz-exit-bubble"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="wz-exit-bubble-msg"
+            >
+              <div class="wz-exit-bubble__well" id="wz-exit-bubble-msg">
+                Thoát game sẽ mất toàn bộ tiến trình đang chơi và không lưu dữ liệu. Bạn chắc chứ?
+              </div>
+
+              <div class="wz-exit-bubble__actions">
+                <button type="button" id="wz-btn-confirm-exit" class="wz-bevel-btn wz-bevel-btn--exit">
+                  Thoát
+                </button>
+                <button type="button" id="wz-btn-stay" class="wz-bevel-btn wz-bevel-btn--stay">
+                  Ở lại
+                </button>
+              </div>
+            </div>
 
             <!-- ====================================================================
             @branch      WOODEN_TYPING_CHAT_BOX_500X80
@@ -118,12 +173,58 @@
             </div>
         </div>
 
+        <!-- ==================================================================
+        @module           GameOverOverlayModal
+        @description      Màn hình kết thúc ván chơi (Slide 2 - Game Over):
+                          - Lớp phủ đen 65% độ tối (#wz-gameover-overlay)
+                          - Bảng gỗ sọc dọc + viền nhộng "GAME OVER" rơi từ trời xuống
+                          - 2 ô dát gỗ phẳng đục đứng hiển thị SỐ TỪ ĐÚNG & ĐIỂM SỐ
+                          - 2 nút bevel đứng (CHƠI LẠI viền lime nhạt, THOÁT viền đỏ tươi)
+        ================================================================== -->
+        <div
+          id="wz-gameover-overlay"
+          class="wz-gameover-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="wz-go-title"
+        >
+          <div id="wz-gameover-board" class="wz-gameover-board">
+            <!-- Viền nhộng tiêu đề GAME OVER đè lên mép trên bảng gỗ -->
+            <div id="wz-go-title" class="wz-gameover-pill">GAME OVER</div>
+
+            <!-- Hàng 1: Công khai bộ đếm ngầm số từ gõ đúng -->
+            <div class="wz-go-row">
+              <span class="wz-go-label">SỐ TỪ ĐÚNG</span>
+              <div class="wz-go-slot">
+                <span id="wz-go-words" class="wz-go-stat-value">0</span>
+              </div>
+            </div>
+
+            <!-- Hàng 2: Tổng điểm đạt được trong ván -->
+            <div class="wz-go-row">
+              <span class="wz-go-label">ĐIỂM SỐ</span>
+              <div class="wz-go-slot">
+                <span id="wz-go-score" class="wz-go-stat-value">0</span>
+              </div>
+            </div>
+
+            <!-- Hàng 3: 2 nút chức năng appear cuối cùng -->
+            <div class="wz-go-actions">
+              <button type="button" id="wz-btn-go-replay" class="wz-go-btn wz-go-btn--replay">
+                CHƠI LẠI
+              </button>
+              <button type="button" id="wz-btn-go-exit" class="wz-go-btn wz-go-btn--exit">
+                THOÁT
+              </button>
+            </div>
+          </div>
+        </div>
 
         <!-- Cửa sổ đục lỗ xuyên thấu ra nền Grassland phía sau -->
         <div class="wz-curtain-window" id="wz-curtain-window">
 
         <!-- @branch DEV_VERSION_TAG_RIGHT_ALIGNED: Nhãn phiên bản neo góc dưới phải khung gỗ -->
-        <span class="wz-version-tag" id="wz-version-tag">v4.1.1205</span>
+        <span class="wz-version-tag" id="wz-version-tag">v4.1.1215_devT3</span>
         <!-- ====================================================================
              @branch      WORDZILLA_SKY_WINDOW_LOGO_SLOT
              @description Khung flex chiếm toàn bộ phần bầu trời phía trên
@@ -144,8 +245,8 @@
             <div class="wz-signin-row">
               <label class="wz-signin-label" for="wz-player-name">TÊN NGƯỜI CHƠI</label>
               <!-- ================================================================
-                @branch      SIGNIN_NAME_INPUT_ERROR_BUBBLE
-                @description Bọc input để neo bong bóng cảnh báo chặn vô danh
+                @branch        SIGNIN_NAME_INPUT_ERROR_BUBBLE
+                @description   Bọc input để neo bong bóng cảnh báo chặn vô danh
               ================================================================ -->
               <div class="wz-input-wrapper">
                 <div id="wz-name-error-bubble" class="wz-error-bubble" role="alert">

@@ -769,3 +769,491 @@
     transform: translate(-50%, -145%) scale(1);
   }
 }
+
+/* ============================================================================
+ * @module      [ADD NEW] FlowerLifeHUDStyle
+ * @docstring   - Bố cục thanh 3 mạng hoa nằm ngay dưới #wz-score-board.
+ *              - Tổng chiều rộng bóp gọn đúng 160px (width: 160px), căn đều 3 hoa
+ *                bằng flexbox (mỗi hoa ~46px + khoảng hở 8px).
+ *              - Ẩn mặc định (opacity: 0), chỉ hiện đồng bộ với bảng điểm khi
+ *                nhận class .is-visible lúc bắt đầu màn chơi.
+ * ============================================================================ */
+.wz-life-board {
+  position: absolute;
+  top: 238px; /* Nằm ngay dưới đáy bảng điểm HUD (khung vàng) */
+  right: 24px;
+  width: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  z-index: 9;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.wz-life-board.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Kích thước từng bông hoa nằm gọn trong khung 160px */
+.wz-life-flower {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35));
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
+}
+
+/* Hiệu ứng giật nảy nhẹ khi bông hoa vừa chuyển sang trạng thái tắt (mất mạng) */
+.wz-life-flower.is-lost {
+  transform: scale(0.88);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+}
+
+/* ============================================================================
+ * @module      ExitGameButtonStyle
+ * @docstring   - Cố định góc dưới-trái cách đều 2 biên đúng 10px (bottom: 10px,
+ *                left: 10px), kích thước chuẩn bóp vào 80px x 80px.
+ *              - Chuyển đổi 3 trạng thái sprite gỗ trong src/buttons/wz_exit_game/
+ *                qua pseudo-class :hover và :active (nhấn lún nhẹ scale(0.95)).
+ *              - Ẩn mặc định (opacity: 0, pointer-events: none), chỉ hiện khi
+ *                nhận class .is-visible lúc bắt đầu màn chơi.
+ * ============================================================================ */
+.wz-exit-btn {
+  position: absolute;
+  bottom: 30px;
+  left: 15px;
+  width: 80px;
+  height: 80px;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-image: url('../src/buttons/wz_exit_game/wz_exit_normal.png');
+  cursor: pointer;
+  z-index: 12;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(14px);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
+  transition: opacity 0.3s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wz-exit-btn.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.wz-exit-btn:hover {
+  background-image: url('../src/buttons/wz_exit_game/wz_exit_hover.png');
+  transform: scale(1.04);
+}
+
+.wz-exit-btn:active {
+  background-image: url('../src/buttons/wz_exit_game/wz_exit_pressed.png');
+  transform: scale(0.95);
+}
+
+/* ============================================================================
+ * @module      [UPDATE] ExitConfirmComicBubbleStyle
+ * @doclogger   - Khung hộp hội thoại tỉ lệ 4:3 (280px x 210px), bo góc 8px,
+ *                nằm ngay phía trên nút #wz-btn-exit và có mũi nhọn ngoắc xuống
+ *                tâm nút (left: 30px) tạo cảm giác bong bóng thoại truyện tranh.
+ *              - Lõi .wz-exit-bubble__well chiếm tỉ lệ tương đương 64:32 (~80% rộng,
+ *                ~54% cao), dùng box-shadow inset không blur (0px) ở viền trên/trái
+ *                để tạo rãnh đục thẳng đứng sắc cạnh (flat-cut), không vát chóp xéo.
+ *              - 2 nút .wz-bevel-btn dùng bevel gradient lồi, hover tăng +15% sáng
+ *                (brightness(1.15)) và active giảm -30% sáng (brightness(0.70))
+ *                độc lập trên mốc gốc 1.00.
+ * ============================================================================ */
+.wz-exit-bubble {
+  position: absolute;
+  left: 20px;
+  bottom: 124px; /* Nằm ngay trên đỉnh nút thoát (bottom 30px + height 80px + 14px khe ngoắc) */
+  width: 280px;
+  height: 210px; /* Tỉ lệ chuẩn 4:3 tương đương 80x60 */
+  padding: 16px 20px 14px;
+  border-radius: 8px;
+  border: 3.5px solid #2b1405;
+  z-index: 25;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+
+  /* Vỏ gỗ dát ngang đồng bộ ngôn ngữ thiết kế Wordzilla */
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0px,
+      transparent 10px,
+      rgba(42, 18, 4, 0.2) 10px,
+      rgba(42, 18, 4, 0.2) 12px
+    ),
+    linear-gradient(180deg, #b87948 0%, #965c32 55%, #7d4923 100%);
+
+  box-shadow:
+    inset 0 2px 0 rgba(255, 232, 195, 0.5),
+    inset 0 -3px 0 rgba(36, 15, 2, 0.65),
+    0 10px 24px rgba(10, 26, 44, 0.45);
+
+  /* Trạng thái ẩn mặc định trước khi bấm nút thoát */
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: 40px calc(100% + 14px); /* Tâm phóng nở đặt ngay tại đầu mũi ngoắc */
+  transform: translateY(8px) scale(0.92);
+  transition: opacity 0.22s ease, transform 0.24s cubic-bezier(0.22, 1.15, 0.36, 1);
+}
+
+.wz-exit-bubble.is-open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+/* Mũi ngoắc truyện tranh viền ngoài chỉ thẳng xuống tâm nút thoát 80px */
+.wz-exit-bubble::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 26px;
+  border-width: 14px 12px 0 12px;
+  border-style: solid;
+  border-color: #2b1405 transparent transparent transparent;
+}
+
+/* Lõi mũi ngoắc truyện tranh khớp màu đáy vỏ gỗ (#7d4923) */
+.wz-exit-bubble::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 29px;
+  border-width: 10px 9px 0 9px;
+  border-style: solid;
+  border-color: #7d4923 transparent transparent transparent;
+}
+
+/* Khung lõi màu dát nâu đục lõm thẳng đứng (flat-cut deboss, không vát chóp) */
+.wz-exit-bubble__well {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 2px solid #2b1405;
+  background: linear-gradient(180deg, #593112 0%, #6b3c18 100%);
+  /* Đục thẳng 4px từ cạnh trên & 3px từ cạnh trái với độ nhòe = 0px */
+  box-shadow:
+    inset 0 4px 0 #261003,
+    inset 3px 0 0 #361805,
+    inset 0 -2px 0 rgba(255, 224, 185, 0.22);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 14.5px;
+  font-weight: 800;
+  line-height: 1.38;
+  color: #fff3db;
+  text-shadow: 0 1.5px 0 #1f0c02;
+}
+
+/* Hàng chứa 2 nút Thoát & Ở lại */
+.wz-exit-bubble__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+/* Nút bo tròn màu dát gỗ với bevel gradient lồi lên */
+.wz-bevel-btn {
+  height: 100%;
+  border-radius: 7px;
+  border: 2.5px solid #2b1405;
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  filter: brightness(1); /* Mốc sáng gốc 100% */
+  transition: filter 0.14s ease, transform 0.1s ease;
+}
+
+/* ============================================================================
+ * @branch      [UPDATE] INNER_SAPWOOD_SKIN_BEVEL_BUTTONS
+ * @doclogger   - Dùng đúng bảng màu dát gỗ (lớp gỗ lột vỏ màu da kem sáng
+ *                đồng bộ với .wz-debris--skin: #f8e2d2 -> #ecc2a6 -> #d89f7c)
+ *                để bật sáng rõ nét trên nền vỏ gỗ nâu tối của hộp hội thoại.
+ *              - Giữ nguyên cấu trúc bevel gradient lồi lên, viền nâu #3d1d08
+ *                và hiệu ứng sáng +15% (hover) / tối -30% (active) từ mốc 100%.
+ * ============================================================================ */
+.wz-bevel-btn--stay,
+.wz-bevel-btn--exit {
+  color: #361805;
+  text-shadow: 0 1px 0 rgba(255, 252, 248, 0.85);
+  background: linear-gradient(180deg, #f8e2d2 0%, #ecc2a6 52%, #d89f7c 100%);
+  box-shadow:
+    inset 0 2.5px 0 rgba(255, 253, 250, 0.9),
+    inset 0 -3px 0 #7a4522,
+    0 3px 0 #2b1405;
+}
+
+/* +15% độ sáng khi hover (mốc 100% -> 115%) */
+.wz-bevel-btn:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+/* -30% độ sáng khi nhấn giữ (mốc 100% -> 70%) */
+.wz-bevel-btn:active {
+  filter: brightness(0.70);
+  transform: translateY(2px);
+}
+
+/* ============================================================================
+ * @module      [UPDATE] Slide1ReturnFadeIn06sAndInstantDisappear
+ * @doclogger   - .wz-instant-disappear: Ngắt transition tức thì (0s) giúp các
+ *                object đang chơi biến mất đột ngột kiểu PPTX Disappear.
+ *              - .is-fading-in: Tạo nhịp fade-in đúng 0.6s cho toàn bộ Logo,
+ *                Form Slide 1 và Tag phiên bản khi tường Sky Steel thu xong.
+ * ============================================================================ */
+.wz-instant-disappear {
+  transition: none !important;
+}
+
+.wz-slide.is-fading-in,
+.wz-game-logo.is-fading-in,
+.wz-version-tag.is-fading-in {
+  transition: opacity 0.6s ease, transform 0.6s ease !important;
+}
+
+/* ============================================================================
+ * @module      GameOverWoodenModalStyle
+ * @doclogger   - Lớp phủ đen độ tối 65% (35% xuyên thấu) bao trùm toàn sân chơi.
+ *              - Bảng gỗ sọc ngang + viền đôi kem/nâu đậm + bevel đục đứng (0px blur).
+ *              - Hiệu ứng 3 nhịp:
+ *                1. Bảng float down từ trên trời (-110vh) vào chính giữa trong 1.0s
+ *                2. Lớp .is-stats-shown bật PPTX Appear cho 2 thông số
+ *                3. Lớp .is-actions-shown bật PPTX Appear cho 2 nút CHƠI LẠI / THOÁT
+ * ============================================================================ */
+.wz-gameover-overlay {
+  position: absolute;
+  inset: 0;                               /* Phủ kín 100% khung sân chơi */
+  z-index: 35;                            /* Nằm trên HUD (9), nút thoát (12) và thẻ rơi (3) */
+  background: rgba(0, 0, 0, 0.65);        /* Giấy phủ đen 65% độ tối (35% nhạt xuống) */
+  opacity: 0;                             /* Ẩn mặc định trước khi hết mạng */
+  pointer-events: none;                   /* Không chặn chuột khi đang chơi */
+  transition: opacity 0.35s ease;         /* Mờ dần 0.35s khi kích hoạt Game Over */
+}
+
+/* Trạng thái kích hoạt màn hình Game Over */
+.wz-gameover-overlay.is-active {
+  opacity: 1;
+  pointer-events: auto;                   /* Khóa thao tác nền sau, chỉ nhận click trên bảng */
+}
+
+/* Khung bảng gỗ chính: kích thước 520px, bo góc 22px, rơi từ trời xuống trong 1s */
+.wz-gameover-board {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 520px;
+  max-width: 92%;
+  padding: 46px 32px 28px;
+  border-radius: 22px;
+  border: 4px solid #2b1405;              /* Viền nâu sẫm khóa mép gỗ */
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  /* Chất liệu gỗ có sọc ngang + chuyển sắc nâu ấm 3 tầng */
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0px,
+      transparent 11px,
+      rgba(38, 15, 3, 0.22) 11px,
+      rgba(38, 15, 3, 0.22) 13px
+    ),
+    linear-gradient(180deg, #9c5a25 0%, #85481a 52%, #6e3a11 100%);
+
+  /* Viền kem bao ngoài + Bevel đục đứng sắc cạnh (blur = 0px) */
+  box-shadow:
+    0 0 0 3px #f6e6cc,                    /* Đường viền kem mảnh bao quanh bảng */
+    inset 0 3px 0 rgba(255, 232, 195, 0.55), /* Gờ sáng đục đứng mép trên */
+    inset 0 -4px 0 #3d1d08,               /* Gờ tối đục đứng mép dưới */
+    0 20px 44px rgba(0, 0, 0, 0.68);      /* Bóng đổ sâu tách bảng khỏi nền tối */
+
+  /* Vị trí xuất phát: giấu tuốt trên bầu trời (-110vh) */
+  transform: translate3d(-50%, calc(-50% - 110vh), 0);
+  transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1); /* Float down đúng 1.0s */
+  will-change: transform;
+}
+
+/* Khi overlay bật .is-active: bảng trượt mượt từ trời xuống chính giữa màn hình */
+.wz-gameover-overlay.is-active .wz-gameover-board {
+  transform: translate3d(-50%, -50%, 0);
+}
+
+/* Viền nhộng (Pill Badge) tiêu đề GAME OVER: 25px, dài 240px (trong khoảng 180-280px) */
+.wz-gameover-pill {
+  position: absolute;
+  top: -27px;                             /* Cắt ngang chính giữa viền trên bảng gỗ */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240px;                           /* Nằm chuẩn trong khoảng 180px - 280px */
+  height: 52px;
+  border-radius: 999px;                   /* Bo tròn 2 đầu tạo hình viên nhộng */
+  border: 3.5px solid #2b1405;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 25px;                        /* Đúng cỡ chữ 25px yêu cầu */
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #fff8eb;
+  text-shadow: 0 2px 0 #2b1405;
+
+  /* Vân gỗ sọc đồng bộ với thân bảng */
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0px,
+      transparent 9px,
+      rgba(38, 15, 3, 0.22) 9px,
+      rgba(38, 15, 3, 0.22) 11px
+    ),
+    linear-gradient(180deg, #9c5a25 0%, #7d4316 100%);
+
+  /* Viền kem + Bevel đục đứng đồng bộ */
+  box-shadow:
+    0 0 0 2.5px #f6e6cc,
+    inset 0 2.5px 0 rgba(255, 232, 195, 0.52),
+    inset 0 -3px 0 #3d1d08,
+    0 6px 14px rgba(0, 0, 0, 0.45);
+}
+
+/* Hàng bố cục 2 cột: Nhãn bên trái (195px) + Ô dát gỗ bên phải */
+.wz-go-row {
+  display: grid;
+  grid-template-columns: 195px 1fr;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Nhãn "SỐ TỪ ĐÚNG" & "ĐIỂM SỐ" cỡ 22px */
+.wz-go-label {
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 0 #2b1405, 0 0 8px rgba(0, 0, 0, 0.4);
+  user-select: none;
+}
+
+/* Ô dát gỗ phẳng + Bevel đục đứng chứa thông số */
+.wz-go-slot {
+  height: 52px;
+  border-radius: 12px;
+  border: 2.5px solid #2b1405;
+  background: linear-gradient(180deg, #f3dfc1 0%, #fae9cf 100%); /* Dát gỗ kem phẳng */
+  /* Đục lõm thẳng đứng (0px blur) tạo chiều sâu khắc gỗ */
+  box-shadow:
+    0 0 0 2px #f6e6cc,
+    inset 0 4px 0 #8a562e,
+    inset 3px 0 0 #a36a3e,
+    inset -2px 0 0 rgba(255, 252, 245, 0.8),
+    inset 0 -2px 0 rgba(255, 252, 245, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Con số thông số: ẩn trước (opacity: 0), bật tức thì kiểu PPTX Appear */
+.wz-go-stat-value {
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 27px;
+  font-weight: 900;
+  color: #3b1d04;
+  text-shadow: 0 1px 0 rgba(255, 252, 245, 0.85);
+  opacity: 0;
+  transition: none;                       /* Không trượt/fade: xuất hiện dứt khoát kiểu PPTX Appear */
+}
+
+.wz-gameover-overlay.is-stats-shown .wz-go-stat-value {
+  opacity: 1;
+}
+
+/* Hàng chứa 2 nút CHƠI LẠI & THOÁT: appear cuối cùng */
+.wz-go-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin-top: 6px;
+  padding: 0 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: none;                       /* PPTX Appear dứt khoát sau khi điểm hiện lên */
+}
+
+.wz-gameover-overlay.is-actions-shown .wz-go-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Nút màu dát gỗ + Bevel đứng */
+.wz-go-btn {
+  height: 52px;
+  border-radius: 12px;
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  color: #5c3412;
+  text-shadow: 0 1px 0 rgba(255, 252, 248, 0.85);
+  /* Màu dát gỗ lột vỏ kem hồng */
+  background: linear-gradient(180deg, #f8e2d2 0%, #ecc2a6 52%, #d89f7c 100%);
+  /* Bevel đứng sắc cạnh (blur = 0px) */
+  box-shadow:
+    inset 0 3px 0 rgba(255, 253, 250, 0.92),
+    inset 0 -4px 0 #8c522b,
+    0 4px 0 #2b1405;
+  cursor: pointer;
+  filter: brightness(1);
+  transition: filter 0.14s ease, transform 0.1s ease;
+}
+
+/* Viền green lime nhạt cho nút CHƠI LẠI */
+.wz-go-btn--replay {
+  border: 3.5px solid #84cc16;
+}
+
+/* Viền đỏ nhạt tươi (+10% sáng, không đỏ máu) cho nút THOÁT */
+.wz-go-btn--exit {
+  border: 3.5px solid #f45b69;
+}
+
+.wz-go-btn:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+
+.wz-go-btn:active {
+  filter: brightness(0.75);
+  transform: translateY(2px);
+}

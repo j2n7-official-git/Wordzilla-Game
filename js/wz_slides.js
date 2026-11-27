@@ -14,6 +14,7 @@ export class WordzillaSlideManager {
     this.curtain = document.getElementById('wz-curtain-window');
     this.slide1 = document.getElementById('wz-slide-1');
     this.logo = document.getElementById('wz-game-logo');
+    this.versionTag = document.getElementById('wz-version-tag');
     this.playerNameInput = document.getElementById('wz-player-name');
     this.errorBubble = document.getElementById('wz-name-error-bubble');
     this.diffButtons = document.querySelectorAll('.wz-diff-btn');
@@ -101,7 +102,6 @@ export class WordzillaSlideManager {
   playStartTransition(onComplete) {
     const playerName = (this.playerNameInput?.value || '').trim();
 
-    // @branch BLOCK_ANONYMOUS_PLAYER: Chặn vào game nếu chưa nhập tên
     if (!playerName) {
       this.showNameError('ERROR: Bạn cần nhập tên trước khi chơi');
       return;
@@ -109,9 +109,15 @@ export class WordzillaSlideManager {
 
     this.hideNameError();
 
-    // Bước 1: Fade out form Slide 1 & Logo
+    // Gỡ trạng thái fade-in của vòng lặp trước (nếu có)
+    this.slide1?.classList.remove('is-fading-in');
+    this.logo?.classList.remove('is-fading-in');
+    this.versionTag?.classList.remove('is-fading-in');
+
+    // Bước 1: Fade out form Slide 1, Logo & Tag phiên bản
     this.slide1?.classList.add('is-fading-out');
     this.logo?.classList.add('is-fading-out');
+    this.versionTag?.classList.add('is-fading-out');
 
     // Bước 2: Sau 260ms, giãn rộng cửa sổ & đẩy màn che Sky Steel ra 4 phía
     setTimeout(() => {
@@ -125,5 +131,49 @@ export class WordzillaSlideManager {
         onComplete({ playerName, difficulty: this.selectedDifficulty });
       }
     }, 980);
+  }
+
+  /**
+   * ==========================================================================
+   * @module      [UPDATE] ReturnToSlide1CurtainContractTransition
+   * @doclogger   - Bước 1: Hiện lại tường Sky Steel từ trạng thái giãn rộng
+   *                (.is-stretching) và thu ngược khung lỗ gỗ nâu 720x380px
+   *                vào chính giữa màn hình trong 700ms.
+   *              - Bước 2: Kích hoạt fade-in đúng 0.6s cho toàn bộ Logo,
+   *                Form Slide 1 và Tag phiên bản để khép kín vòng lặp.
+   * ==========================================================================
+   */
+  playReturnToSlide1Transition(onComplete) {
+    if (!this.curtain) return;
+
+    this.slide1?.classList.remove('is-fading-in');
+    this.logo?.classList.remove('is-fading-in');
+    this.versionTag?.classList.remove('is-fading-in');
+
+    this.slide1?.classList.add('is-fading-out');
+    this.logo?.classList.add('is-fading-out');
+    this.versionTag?.classList.add('is-fading-out');
+
+    // Bật tường xanh ở trạng thái mở rộng -> ép Reflow -> thu về kích thước chuẩn
+    this.curtain.classList.add('is-stretching');
+    this.curtain.classList.remove('is-hidden');
+    void this.curtain.offsetWidth;
+    this.curtain.classList.remove('is-stretching');
+
+    // Sau 700ms tường thu xong -> Fade-in 0.6s toàn bộ giao diện Slide 1
+    setTimeout(() => {
+      this.slide1?.classList.add('is-fading-in');
+      this.logo?.classList.add('is-fading-in');
+      this.versionTag?.classList.add('is-fading-in');
+
+      this.slide1?.classList.remove('is-fading-out');
+      this.logo?.classList.remove('is-fading-out');
+      this.versionTag?.classList.remove('is-fading-out');
+
+      setTimeout(() => {
+        this.playerNameInput?.focus();
+        if (typeof onComplete === 'function') onComplete();
+      }, 600);
+    }, 700);
   }
 }

@@ -1,0 +1,90 @@
+stack từ vựng ( biên soạn mới v4) - bắt buộc lên lấy nguồn sách và các mở rộng đơn giản bên ngoài
+giới hạn độ khó từ CEFR: A1 - C1 (tỉ lệ ước luộng: 35% a1, 25% a2, 20% b1, 15% b2, 5% c1)
+Global success 3
+U3: Our friends (+Include family noun, friends noun)
+type: n, adj, v
+quantity (words): 50 (20n + 15adj + 15v)
+
+U4: Our bodies
+type: n, adj, v
+quantity (words): 50 (20n + 15adj + 15v)
+
+U5: My Hobbies
+type: n, adj, v
+quantity (words): 50 (20n + 15adj + 15v)
+
+U6: Our School
+type: n, adj, v
+quantity (words): 50 (20n + 15adj + 15v)
+
+U9: Colours 
+type: n, adj, v
+quantity (words): 50 (ratio 2n:2adj:1v)
+U-extra: number: from 1 to 100, 1k, 1M, 1B)\
+
+Global Success 4:
+U2: Time and daily routines
+type: n, adj, v
+quantity: 24 (ratio 3x8)
+
+U3: My Week
+type: n, adj, v
+quantity: 20 (ratio 8:6:6)
+
+U6: Our school facilities
+type: n, adj, v, adv-ly
+quantity: 36 (ratio 12x3)
+
+U7: Our time tables
+type: n, adj, v
+quantity: 36 (ratio 12x3)
+
+U8: My favorite subjects (môn học)
+type: n, v
+quantity: 24 (ratio 16n:8v)
+
+U9: Our sports day (thể thao)
+type: n, adj, v
+quantity: 66 (ratio 33x2)
+
+Global Success 5:
+U1: All about me
+type: n, adj, v
+quantity :16 (6n + 6adj + 4v)
+
+U2: Our homes
+type: n, adj, v, adv
+quantity: 60 (ratio 2x20 (n, v) + 2x10 (adj, adv)
+
+U5: My future job
+type: n, adj, v
+quantity: 90 (3x30)
+
+U8: In Our Classroom
+type: n, adj, v, adv
+quantity: 30n + 30adj + 20v + 10adv
+
+U15: Our health (health and pain describe word)
+type: n, adj, v
+quantity: 65 (30n + 15adj + 20v)
+--------------
+rule: some word is in compound build which example: state-of-the-art; omit the typing "-" or some complex noun has build form 2 single noun, also omit "space" rule, just answer seamless-space, if it's match each word, record it
+
+
+-------------
+GLOBAL SUCCESS 10
+-UNIT 1: FAMILY LIFE
+type: n, v, adv, adj (include phrase-combine)
+quantity: 64 (4x16)
+-UNIT 2: HUMANS AND THE ENVIROMENT
+type: n, v, adv, adj (include phrase-combine)
+quantity: 48 (4x12)
+-UNIT 3: MUSIC
+type: n, v, adv, adj (include phrase-combine)
+quantity: 48 (2x10 + 2x14)
+-UNIT 10: ECOTOURISM
+type: n, v, adj (include phrase-combine)
+quantity: 36 (3x12)
+GLOBAL SUCCESS 11
+GLOBAL SUCESSS 12
+
