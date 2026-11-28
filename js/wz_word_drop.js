@@ -16,7 +16,7 @@ import { formatWordHint, normalizeAlphaWord } from './wz_dictionary.js';
  * @description   Tốc độ rơi chuẩn gốc (1.0x) tính bằng px/giây.
  *              Chỉ cần chỉnh duy nhất hằng số này để thay đổi tốc độ toàn game.
  */
-export const BASE_DROP_SPEED = 80;
+export const BASE_DROP_SPEED = 76;
 
 export class WordzillaDropEngine {
   /**
@@ -36,11 +36,13 @@ export class WordzillaDropEngine {
     this.streamConfig = null;
 
     // @branch [UPDATE] ON_CARD_MISSED_HOOK
-    // @docstring Callback lưu hàm xử lý trừ mạng hoa từ wz_main.js truyền vào.
+    // @description Callback lưu hàm xử lý trừ mạng hoa từ wz_main.js truyền vào.
     //            Dùng cơ chế Callback Pattern giúp Engine vật lý tách biệt hoàn toàn
     //            với giao diện HUD (không cần query DOM mạng hoa bên trong file vật lý).
     this.onCardMissed = null;
     this.isFrozen = false; // UPDATE: Cờ đóng băng toàn bộ thẻ rơi & băng truyền khi hết mạng cuối
+    this.isPaused = false; // Cờ tạm dừng toàn bộ vòng lặp (thẻ rơi + mảnh vỡ) khi bấm Pause / Ctrl+P
+    this._loopCallback = null; //Lưu tham chiếu hàm tick để resume() nối lại đúng vòng lặp
   }
 
   /**
@@ -177,7 +179,7 @@ export class WordzillaDropEngine {
 
   /**
    * @module      FreezePlayfieldEngine
-   * @doclogger   Đóng băng tức thì mọi thẻ từ đang lơ lửng trên màn hình và ngắt
+   * @description   Đóng băng tức thì mọi thẻ từ đang lơ lửng trên màn hình và ngắt
    *              băng truyền thả từ mới, nhưng vẫn cho phép 6 mảnh vỡ của thẻ cuối
    *              cùng rơi hết quỹ đạo trọng lực rồi mới dừng requestAnimationFrame.
    */
@@ -186,15 +188,36 @@ export class WordzillaDropEngine {
   }
 
   /**
-   * @module      StopAndClearEngine
-   * @doclogger   Ngắt vòng lặp requestAnimationFrame, mở khóa đóng băng, xóa sạch
-   *              hàng đợi từ vựng, thẻ đang rơi và mảnh vỡ gỗ khi thoát hoặc chơi lại.
+   * @module      DropEngineFreezeMethods
+   * @doclogger   - pause(): Hủy requestAnimationFrame hiện tại để đóng băng
+   *                đứng yên cả thẻ từ rơi, mảnh vỡ gỗ lẫn bộ đếm sinh từ.
+   *              - resume(): Đặt lại lastTimestamp = null để khung hình kế tiếp
+   *                không cộng dồn thời gian tạm dừng vào dt.
    */
+  pause() {
+    if (this.isPaused) return;
+    this.isPaused = true;
+    if (this.rafId !== null) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+    }
+  }
+
+  resume() {
+    if (!this.isPaused) return;
+    this.isPaused = false;
+    this.lastTimestamp = null;
+    if (typeof this._loopCallback === 'function') {
+      this.rafId = requestAnimationFrame(this._loopCallback);
+    }
+  }
+
   stopAndClear() {
     if (this.rafId !== null) {
       cancelAnimationFrame(this.rafId);
       this.rafId = null;
     }
+    this.isPaused = false; // @doclogger Mở khóa cờ tạm dừng khi thoát hoặc chơi lại
     this.isFrozen = false;
     this.lastTimestamp = null;
     this.streamConfig = null;
@@ -300,14 +323,16 @@ export class WordzillaDropEngine {
    *                thực tế (đã loại bỏ dấu cách và gạch nối).
    * ==========================================================================
    */
-  checkAndDestroyWord(inputWord) {
-    // 1. Chuẩn hóa chuỗi người chơi nhập: đưa về chữ thường & xóa sạch dấu cách, gạch nối '-'
+  /**
+   * @description Đối chiếu đáp án, nhân hệ số combo ẩn, làm tròn trần lên hàng chục
+   *            và hiển thị đúng con số tròn chục đó trên hiệu ứng [+ điểm] bay lên.
+   */
+  checkAndDestroyWord(inputWord, comboMultiplier = 1.0) {
     const normalizedInput = normalizeAlphaWord(inputWord);
     if (!normalizedInput) return { matched: false, points: 0 };
 
-    // 2. Quét toàn bộ thẻ đang rơi để tìm thẻ khớp đáp án VÀ có tọa độ Y lớn nhất (nằm thấp nhất)
     let targetIndex = -1;
-    let lowestCardY = -Infinity; // Khởi tạo mốc âm vô cực để mọi tọa độ Y hợp lệ đều lớn hơn
+    let lowestCardY = -Infinity;
 
     this.activeCards.forEach((card, idx) => {
       if (card.answer === normalizedInput && card.y > lowestCardY) {
@@ -316,27 +341,32 @@ export class WordzillaDropEngine {
       }
     });
 
-    // 3. Nếu tìm thấy thẻ mục tiêu -> Kích nổ vật lý, cộng điểm và dọn sạch thẻ khỏi màn hình
     if (targetIndex !== -1) {
       const targetCard = this.activeCards[targetIndex];
+      const basePoints = 20 * Math.max(1, targetCard.answer.length - 1);
+      const earnedPoints = Math.ceil((basePoints * comboMultiplier) / 10) * 10;
 
-      // Công thức điểm: 20 điểm cho mỗi chữ cái tự gõ (trừ 1 chữ cái đầu đã gợi ý sẵn)
-      // Math.max(1, ...) đảm bảo từ 1 ký tự vẫn được tối thiểu 20 điểm, không bị 0 điểm
-      const earnedPoints = 20 * Math.max(1, targetCard.answer.length - 1);
-
-      // Bung 6 mảnh vỡ gỗ tại đúng tọa độ (x, y) và kích thước của thẻ
       this.shatterCard(targetCard.x, targetCard.y, targetCard.width, targetCard.height);
-
-      // Bay hiệu ứng [+ điểm] từ tâm hình chữ nhật của thẻ gỗ
       this.spawnScorePopup(
         targetCard.x + targetCard.width / 2,
         targetCard.y + targetCard.height / 2,
         earnedPoints
       );
 
-      // Gỡ thẻ HTML khỏi giao diện và cắt khỏi mảng quản lý activeCards để ngừng tính rơi
       targetCard.el.remove();
       this.activeCards.splice(targetIndex, 1);
+
+      /* ======================================================================
+       * [LUẬT MỚI - DÂY CHUYỀN TỰ XUỐNG KHI PHÁ THẺ (CHAIN-REACTION FEED)]:
+       * - Math.min(a, b): Hàm toán học trả về giá trị NHỎ HƠN giữa a và b.
+       *   Ở đây ta ép `this.spawnTimer` không được lớn hơn `0.18` giây (nếu đang
+       *   chờ 2.5s thì bị cắt ngay xuống còn 0.18s; nếu đã nhỏ hơn 0.18s thì giữ nguyên).
+       * - Toán tử 3 ngôi `condition ? valTrue : valFalse`: Nếu trên màn hình không
+       *   còn thẻ nào (`length === 0`), thả ngay sau 0.12s; nếu vẫn còn thẻ khác
+       *   đang rơi, nhả nối đuôi sau 0.45s để người chơi luôn có mục tiêu giữ Combo 4s.
+       * ====================================================================== */
+      const chainDelay = this.activeCards.length === 0 ? 0.12 : 0.45;
+      this.spawnTimer = Math.min(this.spawnTimer, chainDelay);
 
       return { matched: true, points: earnedPoints };
     }
@@ -352,6 +382,7 @@ export class WordzillaDropEngine {
     this.lastTimestamp = null;
 
     const tick = (timestamp) => {
+      if (this.isPaused) return; // @doclogger Chặn tuyệt đối mọi khung hình khi đang tạm dừng
       if (this.lastTimestamp === null) this.lastTimestamp = timestamp;
       const dt = Math.min((timestamp - this.lastTimestamp) / 1000, 0.05);
       this.lastTimestamp = timestamp;
@@ -441,12 +472,38 @@ export class WordzillaDropEngine {
              mà không bao giờ bị tràn ra ngoài số làn cho phép. */
       if (!this.isFrozen && this.streamConfig && this.wordQueue.length > 0) {
         const { speedMultiplier, maxOnScreen, totalLanes } = this.streamConfig;
-        const travelDistance = limitLineY + 120;
         const fallSpeed = BASE_DROP_SPEED * speedMultiplier;
-        const cadenceSec = travelDistance / fallSpeed / maxOnScreen;
+
+        /* ====================================================================
+         * [CHÚ THÍCH VẬN HÀNH LỆNH MỚI - KHÓA KHOẢNG CÁCH ĐẦU THẺ -> ĐÍT THẺ = 32PX]:
+         * 1. Bài toán hình học tọa độ:
+         *    - Thẻ mới luôn sinh ra tại đỉnh `y = -120px` và có chiều cao `120px`,
+         *      nên cạnh dưới ("đít thẻ mới") nằm đúng tại vạch `y = -120 + 120 = 0px`.
+         *    - Cạnh trên ("đầu thẻ trước") chính là tọa độ `card.y` của thẻ cao nhất.
+         *    - Để đầu thẻ trước cách đít thẻ mới đúng `32px`, thẻ cao nhất bắt buộc
+         *      phải rơi qua mốc `y >= 32px` trước khi nhả thẻ tiếp theo.
+         * 2. Chu kỳ chuẩn `cadenceSec = (120 + 32) / fallSpeed`:
+         *    - Tổng bước dọc = 120px (chiều cao thẻ) + 32px (khe hở) = 152px.
+         *    - Chia cho `fallSpeed` (px/s) ra đúng thời gian (giây) để 2 thẻ cách nhau 32px.
+         * 3. `this.activeCards.reduce((min, c) => Math.min(min, c.y), Infinity)`:
+         *    - `.reduce(...)` duyệt qua mảng `activeCards` để tìm tọa độ `y` nhỏ nhất
+         *      (tức thẻ đang nằm cao nhất gần đỉnh trời); nếu mảng rỗng trả về `Infinity` (vô cực).
+         * ==================================================================== */
+        const CARD_VERTICAL_GAP_PX = 32; // Khoảng cách từ đầu thẻ trước lên đít thẻ sau (32px) //EDIT TẠI ĐÂY//
+        const CARD_HEIGHT_PX = 120;      // Chiều cao chuẩn của 1 thẻ gỗ (.wz-word-card) //EDIT TẠI ĐÂY//
+        const cadenceSec = (CARD_HEIGHT_PX + CARD_VERTICAL_GAP_PX) / fallSpeed; 
+
+        // Nếu màn hình trống trơn (0 thẻ) -> ép timer còn tối đa 0.2s để thả dây chuyền ngay (EDIT TẠI ĐÂY)
+        if (this.activeCards.length === 0 && this.spawnTimer > 0.20) {
+          this.spawnTimer = 0.10; //EDIT TẠI ĐÂY//
+        }
+
+        // Tìm tọa độ Y của thẻ cao nhất hiện có trên màn hình để kiểm tra khe hở 32px
+        const highestCardY = this.activeCards.reduce((minY, c) => Math.min(minY, c.y), Infinity);
+        const hasEnoughGap = highestCardY >= CARD_VERTICAL_GAP_PX;
 
         this.spawnTimer -= dt;
-        if (this.spawnTimer <= 0 && this.activeCards.length < maxOnScreen) {
+        if (this.spawnTimer <= 0 && this.activeCards.length < maxOnScreen && hasEnoughGap) {
           const nextItem = this.wordQueue.pop();
           this.spawnCard(nextItem.vi, fallSpeed, nextItem.en, this.nextLane, totalLanes);
 
@@ -468,7 +525,8 @@ export class WordzillaDropEngine {
 
       this.rafId = requestAnimationFrame(tick);
     };
-
+    
+    this._loopCallback = tick; //Lưu tham chiếu tick để hàm resume() gọi lại
     this.rafId = requestAnimationFrame(tick);
   }
 }

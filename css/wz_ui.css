@@ -590,7 +590,7 @@
   left: 12px;
   bottom: calc(100% + 10px);
   z-index: 30;
-  /* @doclogger z-index: 30 giữ bong bóng nổi trên viền cửa sổ và ô nhập tên */
+  /* @description z-index: 30 giữ bong bóng nổi trên viền cửa sổ và ô nhập tên */
   padding: 8px 16px;
   border-radius: 10px;
   border: 2.5px solid #4a250b;
@@ -672,7 +672,7 @@
 
 /* ============================================================================
  * @branch      DEV_VERSION_TAG_STYLE_AND_FADEOUT
- * @doclogger   - Neo nhãn phiên bản ngay dưới mép ngoài bên phải khung gỗ
+ * @description   - Neo nhãn phiên bản ngay dưới mép ngoài bên phải khung gỗ
  *                (right: -6px bù trừ viền 6px để thẳng mép ngoài của khung)
  *              - Dùng font Nunito thường (600), màu nâu #4a250b, fade-out 0.26s
  * ============================================================================ */
@@ -697,7 +697,7 @@
 
 /* ============================================================================
  * @branch      WOODEN_DEBRIS_REAL_PHYSICS_AND_SCORE_FLOAT_07S
- * @doclogger   - Mảnh vỡ gỗ (.wz-debris): giữ nguyên opacity: 1 (không làm mờ),
+ * @description   - Mảnh vỡ gỗ (.wz-debris): giữ nguyên opacity: 1 (không làm mờ),
  *                tọa độ & góc xoay do engine vật lý JS tính theo trọng lực thật
  *              - Chữ cộng điểm (.wz-score-popup): bay float lên trong tổng 0.7s,
  *                giữ rõ 0.2s đầu (~28.5%) và fade-out mượt trong 0.5s còn lại
@@ -771,17 +771,16 @@
 }
 
 /* ============================================================================
- * @module      [ADD NEW] FlowerLifeHUDStyle
- * @docstring   - Bố cục thanh 3 mạng hoa nằm ngay dưới #wz-score-board.
- *              - Tổng chiều rộng bóp gọn đúng 160px (width: 160px), căn đều 3 hoa
- *                bằng flexbox (mỗi hoa ~46px + khoảng hở 8px).
- *              - Ẩn mặc định (opacity: 0), chỉ hiện đồng bộ với bảng điểm khi
- *                nhận class .is-visible lúc bắt đầu màn chơi.
+ * @module      [UPDATE] FlowerLifeHUDTopMiddleStyle
+ * @description   - Mục đích tổng bộ: Đưa cụm 3 mạng hoa (.wz-life-board) ra giữa
+ *                trên cùng (top-middle) để người chơi dễ chú ý khi mất mạng.
+ *              - Cụm lệnh căn giữa: Dùng left: 50% kết hợp translate3d(-50%, ...)
+ *                để tâm cụm hoa luôn nằm đúng trục giữa màn hình mọi độ phân giải.
  * ============================================================================ */
 .wz-life-board {
   position: absolute;
-  top: 238px; /* Nằm ngay dưới đáy bảng điểm HUD (khung vàng) */
-  right: 24px;
+  top: 12px;              /* Khoảng cách từ mép trên bầu trời; chỉnh +-6px nếu cần */
+  left: 50%;
   width: 160px;
   display: flex;
   align-items: center;
@@ -790,13 +789,13 @@
   z-index: 9;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-8px);
-  transition: opacity 0.35s ease, transform 0.35s ease;
+  transform: translate3d(-50%, -14px, 0);
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .wz-life-board.is-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate3d(-50%, 0, 0);
 }
 
 /* Kích thước từng bông hoa nằm gọn trong khung 160px */
@@ -812,6 +811,19 @@
 .wz-life-flower.is-lost {
   transform: scale(0.88);
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+}
+
+/* ============================================================================
+ * @branch      FLOWER_LOST_SEQUENCE_FINAL_SHRINK [UPDATE EFFECT]
+ * @docstring   - Mục đích tổng bộ: Tạo trạng thái thu nhỏ (scale 0.82) ở chặng
+ *                cuối (B final) sau khi hoàn tất chuỗi nháy đổi màu A/B.
+ *              - Lý do tối ưu: Tách riêng class .is-lost-final để transition
+ *                chạy độc lập, tránh giật khung hình khi đổi src ảnh liên tục.
+ * ============================================================================ */
+.wz-life-flower.is-lost-final {
+  transform: scale(0.82);
+  filter: drop-shadow(0 2px 3px rgba(15, 35, 58, 0.25));
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), filter 0.25s ease;
 }
 
 /* ============================================================================
@@ -863,7 +875,7 @@
 
 /* ============================================================================
  * @module      [UPDATE] ExitConfirmComicBubbleStyle
- * @doclogger   - Khung hộp hội thoại tỉ lệ 4:3 (280px x 210px), bo góc 8px,
+ * @description - Khung hộp hội thoại tỉ lệ 4:3 (280px x 210px), bo góc 8px,
  *                nằm ngay phía trên nút #wz-btn-exit và có mũi nhọn ngoắc xuống
  *                tâm nút (left: 30px) tạo cảm giác bong bóng thoại truyện tranh.
  *              - Lõi .wz-exit-bubble__well chiếm tỉ lệ tương đương 64:32 (~80% rộng,
@@ -991,7 +1003,7 @@
 
 /* ============================================================================
  * @branch      [UPDATE] INNER_SAPWOOD_SKIN_BEVEL_BUTTONS
- * @doclogger   - Dùng đúng bảng màu dát gỗ (lớp gỗ lột vỏ màu da kem sáng
+ * @description   - Dùng đúng bảng màu dát gỗ (lớp gỗ lột vỏ màu da kem sáng
  *                đồng bộ với .wz-debris--skin: #f8e2d2 -> #ecc2a6 -> #d89f7c)
  *                để bật sáng rõ nét trên nền vỏ gỗ nâu tối của hộp hội thoại.
  *              - Giữ nguyên cấu trúc bevel gradient lồi lên, viền nâu #3d1d08
@@ -1022,7 +1034,7 @@
 
 /* ============================================================================
  * @module      [UPDATE] Slide1ReturnFadeIn06sAndInstantDisappear
- * @doclogger   - .wz-instant-disappear: Ngắt transition tức thì (0s) giúp các
+ * @description   - .wz-instant-disappear: Ngắt transition tức thì (0s) giúp các
  *                object đang chơi biến mất đột ngột kiểu PPTX Disappear.
  *              - .is-fading-in: Tạo nhịp fade-in đúng 0.6s cho toàn bộ Logo,
  *                Form Slide 1 và Tag phiên bản khi tường Sky Steel thu xong.
@@ -1039,7 +1051,7 @@
 
 /* ============================================================================
  * @module      GameOverWoodenModalStyle
- * @doclogger   - Lớp phủ đen độ tối 65% (35% xuyên thấu) bao trùm toàn sân chơi.
+ * @description   - Lớp phủ đen độ tối 65% (35% xuyên thấu) bao trùm toàn sân chơi.
  *              - Bảng gỗ sọc ngang + viền đôi kem/nâu đậm + bevel đục đứng (0px blur).
  *              - Hiệu ứng 3 nhịp:
  *                1. Bảng float down từ trên trời (-110vh) vào chính giữa trong 1.0s
@@ -1256,4 +1268,520 @@
 .wz-go-btn:active {
   filter: brightness(0.75);
   transform: translateY(2px);
+}
+
+/* ============================================================================
+ * @module      InstructionButtonAnchoredToCurtainTopLeft
+ * @description   Neo nút theo góc trên-trái của .wz-curtain-window (top: -54px;
+ *              left: -6px;) với viền nâu #5c3412; khi bật Maximize tự đi theo
+ *              khung gỗ mà không bị lệch tọa độ.
+ * ============================================================================ */
+/* ============================================================================
+ * @desc UPDATE: Tại sao chọn cách này:
+ *       - Đặt `position: absolute` bên trong `.wz-curtain-window` giúp nút lấy
+ *         chính khung cửa sổ gỗ làm gốc tọa độ: khi bật Maximize hoặc đổi cỡ
+ *         màn hình, nút tự bám theo góc khung mà không bị lệch như `fixed`.
+ *       - Dùng `top: -54px; left: -6px;` để đưa nút lên dải nền phía trên
+ *         cạnh trái khung gỗ (45px cao + 9px hở/viền), tránh đè lên vùng chơi.
+ *       - Viền nâu `#5c3412` + `border-radius: 9px` + `box-shadow` giúp nút ăn
+ *         khớp chất liệu gỗ của Wordzilla thay vì trông như ảnh dán rời.
+ * ============================================================================ */
+.wz-instruction-btn {
+  position: absolute; /* Neo theo phần tử cha gần nhất có positioning (.wz-curtain-window) */
+  top: -64px; /* Đẩy lên phía trên mép trên khung gỗ để nằm gọn trên dải nền */
+  left: -6px; /* Căn sát mép trái khung gỗ (bù trừ phần viền khung) */
+  width: 55px; /* Chốt chiều rộng nút 45px theo yêu cầu */
+  height: 55px; /* Chốt chiều cao nút 45px giữ tỷ lệ vuông 1:1 */
+  padding: 0; /* Xóa padding mặc định của thẻ <button> tránh làm méo icon */
+  border: 3px solid #5c3412; /* Viền nâu gỗ đồng bộ tông giao diện */
+  border-radius: 9px; /* Bo góc mềm mại khớp khung và ảnh nút */
+  background-color: transparent; /* Giữ nền trong suốt để lộ rõ ảnh icon */
+  background-repeat: no-repeat; /* Không lặp lại ảnh nếu kích thước thay đổi */
+  background-position: center; /* Căn ảnh nằm giữa tâm nút */
+  background-size: cover; /* Phủ kín khung 45x45 mà không bị chừa viền trống */
+  background-image: url('../src/buttons/wz_instructions/wz-instruction-normal.png'); /* Trạng thái mặc định */
+  cursor: pointer; /* Đổi con trỏ tay khi rê chuột báo hiệu nút bấm được */
+  pointer-events: auto; /* Đảm bảo nhận click ngay cả khi lớp cha có quy tắc xuyên chuột */
+  z-index: 16; /* Nổi trên các lớp nền/khung phụ để không bị che khuất */
+  box-shadow: 0 3px 8px rgba(43, 20, 5, 0.35); /* Tạo bóng nhẹ tách nút khỏi nền trời */
+  transition: transform 0.12s ease, filter 0.14s ease, border-color 0.14s ease; /* Làm mượt hiệu ứng hover/active */
+}
+
+.wz-instruction-btn:hover {
+  background-image: url('../src/buttons/wz_instructions/wz-instruction-hover.png');
+  border-color: #7d4923;
+  transform: scale(1.05);
+}
+
+.wz-instruction-btn:active {
+  background-image: url('../src/buttons/wz_instructions/wz-instruction-pressed.png');
+  border-color: #3b1d06;
+  transform: scale(0.95);
+}
+
+/* Lớp nền phủ mờ khi mở sách hướng dẫn */
+.wz-book-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 32;
+  background: rgba(0, 0, 0, 0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.wz-book-backdrop.is-open {
+  display: flex;
+}
+
+/* ============================================================================
+ * @module      InstructionBook920pxWidth
+ * @description   Tăng chiều rộng bìa sách phẳng 2D lên 920px (giới hạn 94vw)
+ *              để 2 trang nội dung rộng rãi, dễ đọc trên màn hình máy tính.
+ * ============================================================================ */
+.wz-book-cover {
+  position: relative;
+  width: min(1020px, 94vw);
+  height: 640px;
+  max-height: 86vh;
+  padding: 14px;
+  border-radius: 22px;
+  border: 4px solid #2b1405;
+  background: linear-gradient(180deg, #9c5a25 0%, #7d4316 55%, #5e300d 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 232, 195, 0.45),
+    inset 0 -3px 0 #361805,
+    0 16px 36px rgba(0, 0, 0, 0.55);
+  display: flex;
+}
+
+/* Mặt trong 2 trang phẳng màu nâu sáng dát gỗ */
+.wz-book-spread {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  border-radius: 14px;
+  border: 2.5px solid #4a250b;
+  background: linear-gradient(180deg, #f8e2d2 0%, #ecc2a6 52%, #d89f7c 100%);
+  box-shadow: inset 0 2px 6px rgba(59, 29, 4, 0.25);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  overflow: hidden;
+}
+
+.wz-book-page {
+  position: relative;
+  height: 100%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Khung bo góc lớn bên trang trái theo phác thảo bút chì */
+.wz-book-left-box {
+  width: 100%;
+  height: 100%;
+  border: 2.5px solid #5c3412;
+  border-radius: 24px;
+  background: rgba(255, 250, 242, 0.35);
+}
+
+/* Vạch chia giữa: nét đứt 4px:4px luân phiên 3 màu nâu đất trung tính */
+.wz-book-divider {
+  width: 3px;
+  margin: 14px 0;
+  background-image: repeating-linear-gradient(
+    180deg,
+    #8c735b 0px,
+    #8c735b 4px,
+    transparent 4px,
+    transparent 8px,
+    #6e5844 8px,
+    #6e5844 12px,
+    transparent 12px,
+    transparent 16px,
+    #524030 16px,
+    #524030 20px,
+    transparent 20px,
+    transparent 24px
+  );
+}
+
+.wz-book-right-content {
+  flex: 1;
+  font-family: 'Nunito', sans-serif !important;
+  color: #3b1d04;
+}
+
+/* Nhãn số trang 1/n góc dưới phải theo phác thảo */
+.wz-book-page-num {
+  align-self: flex-end;
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 14px;
+  font-weight: 800;
+  color: #5c3412;
+  letter-spacing: 0.5px;
+}
+
+.wz-book-close-btn {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2.5px solid #2b1405;
+  background: linear-gradient(180deg, #f8e2d2 0%, #d89f7c 100%);
+  color: #3b1d04;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* ============================================================================
+ * @module      ComboCircleBadgeStyle [TOP-RIGHT UNDER SCOREBOARD]
+ * @description   - Mục đích: Định vị cụm COMBO ở góc trên-phải (top: 250px,
+ *                right: 65px) ngay dưới bảng điểm và chỉ hiện khi chuỗi >= 2.
+ * ============================================================================ */
+.wz-combo-box {
+  position: absolute;
+  top: 250px;
+  right: 65px;
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px) scale(0.9);
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wz-combo-box.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.wz-combo-label {
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.05;
+  color: #3b1d04;
+  text-shadow: 0 1px 0 rgba(255, 250, 240, 0.75);
+  user-select: none;
+}
+
+/* ============================================================================
+ * @branch      COMBO_CIRCLE_WOODEN_CORE_AND_SVG_PATH_OVERLAY
+ * @description   - Mục đích: Khóa kích thước lõi tròn gỗ 70x70px, viền #e3b193
+ *                dày 4px và giữ vân gỗ chéo 45deg làm tâm cho vòng SVG.
+ * ============================================================================ */
+.wz-combo-circle {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 4px solid #e3b193;
+  box-shadow:
+    0 0 0 2px #593112,
+    0 6px 14px rgba(18, 9, 3, 0.35);
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0px,
+      transparent 7px,
+      rgba(38, 15, 3, 0.32) 7px,
+      rgba(38, 15, 3, 0.32) 12px
+    ),
+    linear-gradient(180deg, #7d4923 0%, #593112 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+}
+
+/* ============================================================================
+ * @branch      SVG_LINE_INTEGRAL_COOLDOWN_RING [90 DEG -> 2PI]
+ * @description   - Mục đích: Khóa cứng SVG đúng 70x70px đè lên vành border 4px
+ *                (inset: -4px), tắt nền đen mặc định (fill: none) và xoay
+ *                -90deg đưa gốc tọa độ về đỉnh 12h (trục 90 độ toán học).
+ * ============================================================================ */
+.wz-combo-ring-svg {
+  position: absolute;
+  inset: -4px;
+  width: 70px;
+  height: 70px;
+  transform: rotate(-90deg);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.wz-combo-ring-progress {
+  fill: none;
+  stroke: #4ade80;
+  stroke-width: 4;
+  stroke-linecap: butt;
+  filter: drop-shadow(0 0 4px rgba(34, 197, 94, 0.75));
+}
+
+.wz-combo-value {
+  position: relative;
+  z-index: 3;
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+  color: #f8e2d2;
+  text-shadow: 0 2px 0 #2b1405;
+  user-select: none;
+}
+
+/* ============================================================================
+ * @branch      COMBO_ZOOM_BOUNCE_KEYFRAME [100% -> 105% -> 100%]
+ * @description   - Mục đích: Tạo nhịp nảy đàn hồi mỗi khi chuỗi combo tăng bậc.
+ * ============================================================================ */
+@keyframes wzComboZoomBounce {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.wz-combo-circle.is-zoom-bounce {
+  animation: wzComboZoomBounce 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ============================================================================
+ * @module      [UPDATE] PauseButtonAndFreezeStyle
+ * @description   - Cụm nút PAUSE/PLAY cố định góc dưới-phải (bottom: 10px, right: 10px)
+ *                đối xứng với nút thoát, kích thước 80x80px, nền nút gỗ bevel.
+ *              - Đổi symbol giữa wz_pause_icon.png và wz_play_icon.png qua class .is-paused.
+ *              - Hiệu ứng đóng băng toàn màn chơi (.wz-freeze-overlay.is-frozen).
+ * ============================================================================ */
+.wz-pause-wrapper {
+  position: absolute; /* @description Định vị tuyệt đối theo khung game #wz-ui-root */
+  bottom: 30px; /* @description Cách đáy 10px bằng nút thoát bên trái */
+  right: 15px; /* @description Cách biên phải 10px đối xứng nút thoát */
+  width: 80px; /* @description Khớp kích thước chuẩn 80px */
+  height: 80px; /* @description Khớp chiều cao chuẩn 80px */
+  z-index: 15; /* @description Nằm trên lớp phủ đóng băng để người chơi bấm Play lại được */
+  opacity: 0; /* @description Ẩn mặc định ngoài màn sảnh Slide 1 */
+  pointer-events: none; /* @description Chặn click khi chưa vào ván chơi */
+  transform: translateY(14px); /* @description Hiệu ứng trượt nhẹ khi vào trận */
+  transition: opacity 0.3s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wz-pause-wrapper.is-visible {
+  opacity: 1; /* @description Hiện nút khi bắt đầu gameplay */
+  pointer-events: auto; /* @description Cho phép tương tác chuột */
+  transform: translateY(0);
+}
+
+.wz-pause-btn {
+  position: relative; /* @description Làm mốc căn giữa symbol bên trong */
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 3px solid #5a2d0c; /* @description Viền gỗ đậm đồng bộ HUD Wordzilla */
+  border-radius: 16px; /* @description Bo góc vuông mềm giống nút thoát */
+  background: linear-gradient(180deg, #d68538 0%, #a85819 55%, #843f0d 100%); /* @description Màu nền nút gỗ 3D */
+  box-shadow:
+    inset 0 3px 2px rgba(255, 224, 178, 0.55),
+    inset 0 -4px 4px rgba(58, 24, 4, 0.65),
+    0 4px 8px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.wz-pause-btn::before {
+  content: ''; /* @description Lớp chứa symbol đơn từ src/buttons/wz_pause_play/ */
+  position: absolute;
+  inset: 14px; /* @description Căn symbol gọn trong lòng nút gỗ 80x80px */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-image: url('../src/buttons/wz_pause_play/wz_pause_icon.png'); /* @description Symbol PAUSE mặc định */
+}
+
+.wz-pause-btn.is-paused {
+  background: linear-gradient(180deg, #4cb874 0%, #2d8a50 55%, #1e6338 100%); /* @description Đổi sắc xanh ngọc nổi bật trạng thái sẵn sàng Play */
+  border-color: #164929;
+}
+
+.wz-pause-btn.is-paused::before {
+  background-image: url('../src/buttons/wz_pause_play/wz_play_icon.png'); /* @description Đổi sang symbol PLAY đơn khi đang tạm dừng */
+}
+
+.wz-pause-btn:hover {
+  filter: brightness(1.12); /* @description Tăng sáng 12% khi rê chuột */
+  transform: scale(1.04);
+}
+
+.wz-pause-btn:active {
+  filter: brightness(0.88); /* @description Hiệu ứng nhấn lún nút */
+  transform: scale(0.95);
+}
+
+/* Box-chat hướng dẫn phím tắt nằm ngay phía trên nút PAUSE */
+.wz-pause-tooltip {
+  position: absolute;
+  bottom: 92px; /* @description Nằm ngay trên đỉnh nút 80px */
+  right: 0;
+  width: 230px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 2px solid #6b3811;
+  background: rgba(255, 248, 235, 0.96);
+  color: #4a2508;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.wz-pause-tooltip::after {
+  content: ''; /* @description Đuôi nhọn box-chat trỏ thẳng xuống tâm nút PAUSE */
+  position: absolute;
+  bottom: -8px;
+  right: 32px;
+  border-width: 8px 8px 0;
+  border-style: solid;
+  border-color: #6b3811 transparent transparent;
+}
+
+.wz-pause-wrapper:hover .wz-pause-tooltip,
+.wz-pause-btn:focus-visible + .wz-pause-tooltip,
+.wz-pause-wrapper.is-paused-hint .wz-pause-tooltip {
+  opacity: 1; /* @description Hiện box-chat hướng dẫn khi hover hoặc đang tạm dừng */
+  transform: translateY(0);
+}
+
+/* Hiệu ứng đóng băng toàn sân chơi */
+.wz-freeze-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 11; /* @description Phủ lên thẻ từ rơi & mặt đất, nằm dưới HUD và nút điều khiển */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(186, 230, 253, 0.16) 35%, rgba(56, 189, 248, 0.36) 100%);
+  backdrop-filter: blur(2.5px) saturate(0.75); /* @description Làm mờ lạnh & giảm bão hòa màu tạo cảm giác đóng băng */
+  box-shadow: inset 0 0 65px rgba(125, 211, 252, 0.75); /* @description Viền sương giá xanh băng quanh 4 cạnh màn hình */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+.wz-freeze-overlay.is-frozen {
+  opacity: 1; /* @description Kích hoạt đóng băng tức thì */
+}
+
+.wz-freeze-badge {
+  padding: 12px 28px;
+  border-radius: 16px;
+  border: 3px solid #e0f2fe;
+  background: rgba(12, 74, 110, 0.82);
+  color: #f0f9ff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.45);
+}
+
+/* ============================================================================
+ * @module      AudioToggleWoodenButtons75pxWithIcons
+ * @description   - Đặt tại góc trên-phải của .wz-curtain-window (top: -84px,
+ *                right: -6px), bám sát viền trên khung gỗ cửa sổ.
+ *              - Kích thước nút 75x75px (+10px so với 65px) và inset icon 4px
+ *                giúp cả khung gỗ lẫn 4 biểu tượng Music/Sound to rõ nét.
+ * ============================================================================ */
+.wz-audio-controls {
+  position: absolute; /* @description Neo theo khung gỗ .wz-curtain-window đối xứng nút sách */
+  top: -64px; /* @description Ngang hàng 100% với top: -64px của .wz-instruction-btn */
+  right: -6px; /* @description Căn thẳng mép ngoài bên phải bảng gỗ (bù trừ viền 6px) */
+  display: flex;
+  align-items: center;
+  gap: 15px; /* @description Khoảng cách giữa 2 nút Music và Sound bằng đúng 15px */
+  z-index: 16; /* @description Ngang lớp hiển thị với nút sách hướng dẫn */
+  pointer-events: auto;
+}
+
+.wz-wood-toggle-btn {
+  position: relative;
+  width: 55px; /* @description Khóa kích thước vỏ nút bằng đúng 55x55px của nút sách */
+  height: 55px;
+  padding: 0;
+  border: 3px solid #5c3412; /* @description Viền nâu gỗ đồng bộ nút sách hướng dẫn */
+  border-radius: 9px; /* @description Bo góc 9px khớp 100% với nút sách hướng dẫn */
+  cursor: pointer;
+
+  /* Lớp 1: Đúng 5 sọc vân gỗ ngang | Lớp 2: Nền gỗ nâu ấm */
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0px,
+      transparent 8px,
+      rgba(42, 18, 4, 0.28) 8px,
+      rgba(42, 18, 4, 0.28) 10px
+    ),
+    linear-gradient(180deg, #b8743c 0%, #965728 52%, #754019 100%);
+
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 232, 195, 0.5),
+    inset 0 -2px 3px rgba(34, 15, 2, 0.6),
+    0 3px 8px rgba(43, 20, 5, 0.35);
+  transition: transform 0.12s ease, filter 0.14s ease, border-color 0.14s ease;
+}
+
+/* Lớp chứa icon PNG: vỏ giữ 55px nhưng hình nốt nhạc/loa bên trong phóng to lên 115% */
+.wz-wood-toggle-btn::before {
+  content: '';
+  position: absolute;
+  inset: 2px; /* @description Thu hẹp lề đệm tối đa để mở rộng vùng chứa icon */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 115%; /* @description Phóng to hình bên trong mà không làm to khung nút 55px */
+  pointer-events: none;
+}
+
+/* Trạng thái Music: Bật / Tắt */
+.wz-wood-toggle-btn--music::before {
+  background-image: url('../src/wz_soundandmusic/wz_wooden_music.png');
+}
+.wz-wood-toggle-btn--music.is-muted::before {
+  background-image: url('../src/wz_soundandmusic/wz_wooden_music_mute.png');
+}
+
+/* Trạng thái Sound (SFX): Bật / Tắt */
+.wz-wood-toggle-btn--sound::before {
+  background-image: url('../src/wz_soundandmusic/wz_wooden_sound.png');
+}
+.wz-wood-toggle-btn--sound.is-muted::before {
+  background-image: url('../src/wz_soundandmusic/wz_wooden_sound_mute.png');
+}
+
+.wz-wood-toggle-btn.is-muted {
+  filter: brightness(0.85) saturate(0.8); /* @description Giảm nhẹ độ sáng báo hiệu kênh đang tắt */
+}
+
+.wz-wood-toggle-btn:hover {
+  border-color: #7d4923;
+  filter: brightness(1.08);
+  transform: scale(1.05);
+}
+
+.wz-wood-toggle-btn:active {
+  border-color: #3b1d06;
+  transform: scale(0.95);
 }

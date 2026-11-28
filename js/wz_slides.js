@@ -25,7 +25,7 @@ export class WordzillaSlideManager {
     this.bubbleTimer = null;
 
     // @branch PRELOAD_ERROR_SFX: Nạp sẵn âm thanh báo lỗi khi bỏ trống tên
-    this.errorSound = new Audio('src/sfx/wz_error_sound.wav');
+    this.errorSound = new Audio('src/sfx/sound/wz_error_sound.wav');
     this.errorSound.preload = 'auto';
 
     this.bindEvents();

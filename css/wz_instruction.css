@@ -1,0 +1,208 @@
+/**
+ * ============================================================================
+ * @file        css/wz_instruction.css
+ * @module      InstructionBookStandaloneStyles
+ * @doclogger   Tách riêng toàn bộ giao diện nút mở sách 45x45px và quyển sách
+ *              phẳng 2D (920px) để giữ wz_ui.css gọn nhẹ, dễ bảo trì.
+ * ============================================================================
+ */
+
+/* ============================================================================
+ * @module      InstructionBookLockedLayoutAndPages
+ * @doclogger   Khóa cứng kích thước 2 nửa trang (50% - 50%) để không bị co giãn
+ *              hay đè chữ xuống thanh phân trang khi chuyển từ trang 1 đến 5.
+ * ============================================================================ */
+.wz-book-page--left,
+.wz-book-page--right {
+  flex: 1 1 0; /* @doclogger Chia đều chính xác 50% chiều rộng cho mỗi nửa trang */
+  width: 50%; /* @doclogger Khóa bề ngang cố định, không giãn theo ảnh hay chữ */
+  height: 100%; /* @doclogger Khóa trọn chiều cao bên trong ruột sách */
+  min-width: 0; /* @doclogger Ngăn nội dung dài làm phình chiều rộng cột Flexbox */
+  min-height: 0; /* @doclogger Ngăn nội dung cao đẩy tràn chiều cao trang */
+  overflow: hidden; /* @doclogger Giữ toàn bộ chữ và ảnh nằm gọn trong trang */
+  box-sizing: border-box; /* @doclogger Tính padding vào trong kích thước chuẩn */
+}
+
+.wz-book-page--right {
+  position: relative; /* @doclogger Làm gốc tọa độ neo thanh phân trang ở đáy */
+  padding: 22px 22px 60px 22px; /* @doclogger Chừa sẵn 60px ở đáy để chữ không bao giờ đè lên nút chuyển trang */
+}
+
+/* ============================================================================
+ * @module      InstructionBookTwoPageGrid
+ * @doclogger   Khóa ruột sách (.wz-book-spread) thành 2 trang đối xứng 50% - 50%
+ *              hai bên vạch chia (.wz-book-divider) và ép .wz-book-page bung
+ *              đủ 100% chiều rộng từng nửa trang để chữ và nút không bị bóp hẹp.
+ * ============================================================================ */
+.wz-book-spread {
+  display: grid !important; /* @doclogger Chia 3 cột: Trang trái (1fr) | Vạch chia (auto) | Trang phải (1fr) */
+  grid-template-columns: 1fr auto 1fr !important;
+  align-items: stretch !important;
+  column-gap: 16px; /* @doclogger Khoảng cách đều hai bên vạch kẻ giữa */
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.wz-book-page {
+  width: 100% !important; /* @doclogger Ghi đè width: 50% cũ từ wz_ui.css để bung trọn 100% nửa trang */
+  max-width: 100% !important;
+  height: 100% !important; /* @doclogger Khóa cố định chiều cao trang, không nhảy kích thước khi lật */
+  min-width: 0;
+  min-height: 0;
+  display: flex !important; /* @doclogger Xếp dọc nội dung trang trên và thanh nút chuyển trang ở đáy */
+  flex-direction: column !important;
+  justify-content: space-between;
+  padding: 18px 18px 14px 18px !important;
+  box-sizing: border-box !important;
+  overflow: hidden;
+}
+
+.wz-book-divider {
+  align-self: stretch; /* @doclogger Kéo dài vạch kẻ nét đứt từ trên xuống dưới ruột sách */
+  height: auto !important;
+}
+
+.wz-book-left-box {
+  flex: 1 1 auto; /* @doclogger Bung khung viền ảnh lấp đầy toàn bộ trang bên trái */
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0;
+  min-height: 0;
+  display: flex; /* @doclogger Căn giữa ảnh screenshot theo cả 2 trục */
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.wz-book-hero-img {
+  max-width: 100%; /* @doclogger Giữ ảnh nằm gọn trong khung viền bo góc */
+  max-height: 100%;
+  object-fit: contain; /* @doclogger Không cắt xén chi tiết ảnh chụp màn hình game */
+  border-radius: 12px;
+}
+
+.wz-book-right-content {
+  flex: 1 1 auto; /* @doclogger Chiếm trọn phần không gian phía trên thanh phân trang */
+  width: 100% !important;
+  min-width: 0;
+  min-height: 0;
+  display: flex; /* @doclogger Căn giữa khối tiêu đề + đoạn mô tả theo chiều dọc */
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px; /* @doclogger Khoảng cách đồng đều giữa tiêu đề và đoạn văn trên cả 6 trang */
+  padding: 4px 4px 10px 4px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* --- Tiêu đề Trang 1 (Chào mừng) --- */
+.wz-book-welcome-title {
+  margin: 0;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 26px; /* @doclogger Cỡ chữ 23px gọn gàng, không chạm mép trên trang sách */
+  line-height: 1.32;
+  text-align: center;
+  color: #4a2508;
+}
+
+/* --- Tiêu đề Trang 2 -> 6 (Mỗi chức năng 1 tiêu đề) --- */
+.wz-book-page-title {
+  margin: 0;
+  padding-bottom: 8px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 22.5px; /* @doclogger Cỡ chữ tiêu đề thống nhất cho các trang chức năng */
+  line-height: 1.3;
+  color: #4a2508;
+  border-bottom: 2px dashed rgba(92, 51, 18, 0.3);
+}
+
+/* --- Đoạn mô tả dùng chung cho cả 6 trang --- */
+.wz-book-page-desc {
+  margin: 0;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+  font-size: 18.5px; /* @doclogger Đồng bộ 1 cỡ chữ & giãn dòng trên cả 6 trang */
+  line-height: 1.62;
+  text-align: justify;
+  color: #5c3312;
+}
+
+.wz-book-page-desc strong {
+  font-weight: 800;
+  color: #3d1d05;
+}
+
+/* ============================================================================
+ * @module      InstructionBookCircularPagination
+ * @doclogger   Trải thanh [ ◀ ] ─────── 1/6 ─────── [ ▶ ] rộng hết bề ngang
+ *              trang phải; 2 nút tròn tông kem viền nâu đồng bộ nút đóng (×).
+ * ============================================================================ */
+.wz-book-pagination {
+  flex-shrink: 0; /* @doclogger Neo cố định ở đáy trang phải */
+  position: static !important;
+  width: 100% !important;
+  height: 36px;
+  display: flex;
+  align-items: center; /* @doclogger Căn giữa theo trục dọc cho cả nút và số trang */
+  justify-content: space-between; /* @doclogger Đẩy 2 nút tròn ra 2 biên, số trang nằm chính giữa */
+}
+
+.wz-book-pagination .wz-book-page-num {
+  position: static !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1 !important; /* Triệt tiêu khoảng trống baseline làm tụt chữ xuống dưới */
+  transform: translateY(-10px); /* Nâng số trang 1/4 lên ngang tâm 2 nút tròn */
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  color: #4a2508;
+}
+
+.wz-book-nav-line {
+  flex: 1 1 auto; /* @doclogger Vạch nét đứt tự kéo dài nối từ 2 nút tròn vào số trang ở giữa */
+  height: 0;
+  border-bottom: 2px dashed rgba(92, 51, 18, 0.45);
+}
+
+.wz-book-nav-btn {
+  flex-shrink: 0;
+  width: 34px; /* @doclogger Kích thước hình tròn đồng bộ nút đóng (×) */
+  height: 34px;
+  padding: 0;
+  border-radius: 50%; /* @doclogger Bo tròn 50% giống nút (×) */
+  border: 2.5px solid #4a2508; /* @doclogger Viền nâu sẫm đồng bộ nút (×) */
+  background: linear-gradient(180deg, #f8e5ce 0%, #e5be93 100%); /* @doclogger Nền kem ấm đồng bộ nút (×) */
+  color: #4a2508; /* @doclogger Biểu tượng ◀ / ▶ nâu đậm sắc nét */
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(43, 20, 5, 0.28);
+  transition: transform 0.12s ease, filter 0.14s ease;
+}
+
+.wz-book-nav-btn:hover:not(:disabled) {
+  filter: brightness(1.05);
+  transform: scale(1.08);
+}
+
+.wz-book-nav-btn:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.wz-book-nav-btn:disabled {
+  opacity: 0.35; /* @doclogger Làm mờ nút khi ở trang 1/6 hoặc 6/6 */
+  cursor: default;
+}
